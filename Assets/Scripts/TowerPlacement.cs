@@ -19,6 +19,7 @@ public class TowerPlacement : MonoBehaviour
     private GameObject previewTower;
     private Renderer previewRenderer;
     private readonly Dictionary<Vector3Int, bool> occupiedTiles = new();
+    private bool canPlaceTower;
 
     void Start()
     {
@@ -37,11 +38,26 @@ public class TowerPlacement : MonoBehaviour
             Collider col = previewTower.GetComponent<Collider>();
             if (col != null) col.enabled = false;
             previewRenderer = previewTower.GetComponentInChildren<Renderer>();
+             previewRenderer.enabled = false;
         }
     }
 
     void Update()
     {
+        if (!canPlaceTower)
+            {
+                previewRenderer.enabled = false;
+            }
+            else
+            {
+               previewRenderer.enabled = true;
+           }
+        if (!canPlaceTower)
+        {
+            return;
+        }
+        Debug.Log(canPlaceTower);
+
         if (mainCamera == null || tilemap == null) return;
 
         Vector2 mousePos = Mouse.current.position.ReadValue();
@@ -56,23 +72,35 @@ public class TowerPlacement : MonoBehaviour
 
         bool occupied = occupiedTiles.ContainsKey(cell) && occupiedTiles[cell];
 
-        // Update preview
-        if (previewTower != null)
-        {
-            previewTower.transform.position = cellCenter;
-            if (previewRenderer != null)
-                previewRenderer.material.color = occupied ? invalidColor : validColor;
-        }
+
+
 
         // Place tower
         if (Mouse.current.leftButton.wasPressedThisFrame && !occupied)
         {
             GameObject newTower = Instantiate(towerPrefab, cellCenter, Quaternion.identity);
             occupiedTiles[cell] = true;
+            canPlaceTower = false;
 
             // Automatically register to billboard manager
             if (billboardManager != null)
                 billboardManager.RegisterSprite(newTower.transform);
         }
+        // Update preview
+        if (previewTower != null)
+        {
+            
+            previewTower.transform.position = cellCenter;
+            if (previewRenderer != null)
+                previewRenderer.material.color = occupied ? invalidColor : validColor;
+        }
+        
+        
+    }
+    public void CanPlaceTower()
+    {
+       
+            canPlaceTower = true;
+       
     }
 }
