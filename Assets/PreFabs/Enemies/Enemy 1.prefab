@@ -173,4 +173,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyFollowPath
   speed: 0.5
-  useOptimalPath: 1
+  useOptimalPath: 0
