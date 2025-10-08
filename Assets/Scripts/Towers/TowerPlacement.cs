@@ -16,10 +16,11 @@ public class TowerPlacement : MonoBehaviour
     public Color validColor = new Color(0f, 1f, 0f, 0.6f);
     public Color invalidColor = new Color(1f, 0f, 0f, 0.6f);
 
-    private GameObject previewTower;
+    public GameObject previewTower;
     private Renderer previewRenderer;
     private readonly Dictionary<Vector3Int, bool> occupiedTiles = new();
     private bool canPlaceTower;
+  
 
     void Start()
     {
@@ -37,6 +38,7 @@ public class TowerPlacement : MonoBehaviour
 
     void Update()
     {
+
         if (!canPlaceTower)
         {
             if (previewRenderer != null) previewRenderer.enabled = false;
@@ -46,7 +48,11 @@ public class TowerPlacement : MonoBehaviour
         {
             if (previewRenderer != null) previewRenderer.enabled = true;
         }
-
+        if (Keyboard.current.shiftKey.wasReleasedThisFrame)
+        {
+            canPlaceTower = false;
+        }
+      
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = mainCamera.ScreenPointToRay(mousePos);
         Plane plane = new(Vector3.up, Vector3.zero);
@@ -60,7 +66,7 @@ public class TowerPlacement : MonoBehaviour
 
         // Check if this cell exists in the path tilemap
         // Mark all small tiles overlapping the path as occupied
-        
+
         // Update preview color
         if (previewTower != null)
         {
@@ -73,10 +79,16 @@ public class TowerPlacement : MonoBehaviour
         if (Mouse.current.leftButton.wasPressedThisFrame && !occupied)
         {
             GameObject newTower = Instantiate(towerPrefab, cellCenter, Quaternion.identity);
-            occupiedTiles[cell] = true;
+            if (!Keyboard.current.shiftKey.isPressed || Keyboard.current.shiftKey.wasReleasedThisFrame)
+{
+    canPlaceTower = false;
+}
+            
+                occupiedTiles[cell] = true;
 
-            if (billboardManager != null)
-                billboardManager.RegisterSprite(newTower.transform);
+                if (billboardManager != null)
+                    billboardManager.RegisterSprite(newTower.transform);
+            
         }
     }
 
@@ -87,17 +99,30 @@ public class TowerPlacement : MonoBehaviour
     }
 
     public void UpdatePreview()
-    {
-        if (towerPrefab != null && previewTower == null)
-        {
-            previewTower = Instantiate(towerPrefab);
-            Collider col = previewTower.GetComponent<Collider>();
-            if (col != null) col.enabled = false;
+    { 
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Preview"))
+{
+    Destroy(obj);
+}      
 
-            previewRenderer = previewTower.GetComponentInChildren<Renderer>();
-            previewTower.transform.localScale += new Vector3(0.001f, 0.001f, 0.001f);
-            if (previewRenderer != null) previewRenderer.enabled = false;
+        if(previewTower != towerPrefab)
+        {
+            previewTower = towerPrefab;
         }
+        {
+
+        }
+            previewTower = Instantiate(towerPrefab);
+            previewTower.name = "PreviewTower";
+                previewTower.tag = "Preview";
+                Collider col = previewTower.GetComponent<Collider>();
+                if (col != null) col.enabled = false;
+
+                previewRenderer = previewTower.GetComponentInChildren<Renderer>();
+                previewTower.transform.localScale += new Vector3(0.01f, 0.01f, 0.01f);
+                if (previewRenderer != null) previewRenderer.enabled = false;
+            
+        
     }
    // Call in Start()
 // Call this in Start() to mark all small tiles under path hexes

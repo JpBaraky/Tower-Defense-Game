@@ -16,6 +16,7 @@ public class ButtonBuyTower : MonoBehaviour
     public void ButtonTower()
     {
         towerPlacement.towerPrefab = towerPrefab;
+      
         towerPlacement.CanPlaceTower();
 
     }
