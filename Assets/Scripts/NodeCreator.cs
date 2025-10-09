@@ -20,6 +20,7 @@ public class NodeCreator : MonoBehaviour
     private List<TileNode> mainPath = new List<TileNode>();
     private float neighborThreshold = 1.1f; // slightly larger than cell size to account for floating errors
 
+   
     void Update()
     {
         if (TilesChanged())
@@ -46,30 +47,31 @@ public class NodeCreator : MonoBehaviour
         }
         return changed;
     }
+  
 
     void RecreateNodes()
     {
         // -----------------------
         // 1. Destroy old nodes
         // -----------------------
-        if (createdNodes != null)
-        {
-            List<TileNode> nodesToDelete = new List<TileNode>(createdNodes);
-            foreach (TileNode node in nodesToDelete)
-            {
-                if (node != null)
-                {
-                    if (Application.isPlaying)
-                        Destroy(node.gameObject);
-                    else
-                        DestroyImmediate(node.gameObject);
-                }
-            }
+        
+         GameObject[] nodesToDelete = GameObject.FindGameObjectsWithTag("Node");
 
-            createdNodes.Clear();
-            nodeLookup.Clear();
-            mainPath.Clear();
-        }
+foreach (GameObject node in nodesToDelete)
+{
+    if (node != null)
+    {
+        if (Application.isPlaying)
+            Destroy(node);
+        else
+            DestroyImmediate(node);
+    }
+}
+
+// Clear tracking lists
+createdNodes.Clear();
+nodeLookup.Clear();
+mainPath.Clear();
 
         // -----------------------
         // 2. Create nodes for all tiles
@@ -200,8 +202,7 @@ public class NodeCreator : MonoBehaviour
         float halfTile = tilemap.cellSize.x * 0.5f;
         return spawnerNode.transform.position + dir * halfTile;
     }
-
-    void OnDrawGizmos()
+ void OnDrawGizmos()
     {
         if (mainPath == null || mainPath.Count == 0) return;
 

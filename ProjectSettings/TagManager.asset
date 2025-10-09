@@ -8,6 +8,7 @@ TagManager:
   - Exit
   - Castle
   - Preview
+  - Node
   layers:
   - Default
   - TransparentFX
