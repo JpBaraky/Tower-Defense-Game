@@ -172,5 +172,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab82880478ab57f40ba5404f5470b242, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyFollowPath
-  speed: 0.5
+  speed: 1
   useOptimalPath: 0
