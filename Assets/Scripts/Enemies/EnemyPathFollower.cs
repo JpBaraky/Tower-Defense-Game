@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -5,41 +6,44 @@ using UnityEngine;
 public class EnemyFollowPath : MonoBehaviour
 {
     public float speed = 2f;
-    public bool useOptimalPath = true; // true = A*, false = node-by-node
+    public bool useOptimalPath = true;
     private Pathfinding pathfinder;
     private List<TileNode> path;
     private int currentIndex = 0;
+    public Transform nextNode;
 
     void Start()
     {
-        pathfinder = FindAnyObjectByType<Pathfinding>();
+        StartCoroutine(InitAfterNodesExist());
+    }
 
-        // Get all nodes
-        var allNodes = FindObjectsByType<TileNode>(FindObjectsSortMode.None)
+    IEnumerator InitAfterNodesExist()
+    {
+        // wait one frame so NodeCreator can finish
+        yield return null; 
+
+        pathfinder = FindAnyObjectByType<Pathfinding>();
+        var allNodes = GameObject.FindGameObjectsWithTag("Node")
+            .Select(go => go.GetComponent<TileNode>())
             .Where(n => n != null)
             .ToArray();
 
         if (allNodes == null || allNodes.Length < 2)
-            return;
+            yield break;
 
         var start = allNodes.OrderBy(n => n.number).FirstOrDefault();
         var end = allNodes.OrderBy(n => n.number).LastOrDefault();
 
         if (start == null || end == null)
-            return;
+            yield break;
 
+        // start enemy at spawn node
         transform.position = start.transform.position;
 
         if (useOptimalPath && pathfinder != null)
-        {
-            // A* path
             path = pathfinder.FindPath(start.transform.position, end.transform.position);
-        }
         else
-        {
-            // Dumb path: strictly node number order
-            path = allNodes.Where(n => n != null).OrderBy(n => n.number).ToList();
-        }
+            path = allNodes.OrderBy(n => n.number).ToList();
     }
 
     void Update()
@@ -55,6 +59,7 @@ public class EnemyFollowPath : MonoBehaviour
         }
 
         Vector3 targetPos = currentNode.transform.position;
+        nextNode = currentNode.transform;
         transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
 
         if (Vector3.Distance(transform.position, targetPos) < 0.05f)
