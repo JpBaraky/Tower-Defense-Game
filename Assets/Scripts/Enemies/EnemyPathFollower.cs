@@ -15,11 +15,18 @@ public class EnemyFollowPath : MonoBehaviour
         pathfinder = FindAnyObjectByType<Pathfinding>();
 
         // Get all nodes
-        var allNodes = FindObjectsByType<TileNode>(FindObjectsSortMode.None);
-        if (allNodes.Length < 2) return;
+        var allNodes = FindObjectsByType<TileNode>(FindObjectsSortMode.None)
+            .Where(n => n != null)
+            .ToArray();
 
-        var start = allNodes.OrderBy(n => n.number).First();
-        var end = allNodes.OrderBy(n => n.number).Last();
+        if (allNodes == null || allNodes.Length < 2)
+            return;
+
+        var start = allNodes.OrderBy(n => n.number).FirstOrDefault();
+        var end = allNodes.OrderBy(n => n.number).LastOrDefault();
+
+        if (start == null || end == null)
+            return;
 
         transform.position = start.transform.position;
 
@@ -31,15 +38,23 @@ public class EnemyFollowPath : MonoBehaviour
         else
         {
             // Dumb path: strictly node number order
-            path = allNodes.OrderBy(n => n.number).ToList();
+            path = allNodes.Where(n => n != null).OrderBy(n => n.number).ToList();
         }
     }
 
     void Update()
     {
-        if (path == null || currentIndex >= path.Count) return;
+        if (path == null || path.Count == 0 || currentIndex >= path.Count)
+            return;
 
-        Vector3 targetPos = path[currentIndex].transform.position;
+        var currentNode = path[currentIndex];
+        if (currentNode == null)
+        {
+            currentIndex++;
+            return;
+        }
+
+        Vector3 targetPos = currentNode.transform.position;
         transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
 
         if (Vector3.Distance(transform.position, targetPos) < 0.05f)
