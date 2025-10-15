@@ -18,13 +18,13 @@ MonoBehaviour:
         serializedData:
         - key: 0
           value:
-            rid: 688844395802525948
+            rid: 688844395802526236
         - key: 1
           value:
-            rid: 688844395802525949
+            rid: 688844395802526237
         - key: 2
           value:
-            rid: 688844395802525950
+            rid: 688844395802526238
       lastMaterialMappings:
         serializedData:
         - key: Universal Render Pipeline/Lit
@@ -61,15 +61,15 @@ MonoBehaviour:
           value: _MetallicGlossMap
         - key: 11
           value: None
-    - rid: 688844395802525948
+    - rid: 688844395802526236
       type: {class: ModelSelection, ns: Unity.AI.Material.Services.Stores.States, asm: Unity.AI.Material}
       data:
         modelID: 575ecf67-4425-4939-97b9-5e138b8ee234
-    - rid: 688844395802525949
+    - rid: 688844395802526237
       type: {class: ModelSelection, ns: Unity.AI.Material.Services.Stores.States, asm: Unity.AI.Material}
       data:
         modelID: 
-    - rid: 688844395802525950
+    - rid: 688844395802526238
       type: {class: ModelSelection, ns: Unity.AI.Material.Services.Stores.States, asm: Unity.AI.Material}
       data:
         modelID: 

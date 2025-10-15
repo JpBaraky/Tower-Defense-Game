@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4007973430043241712}
   - component: {fileID: 7169061118519455010}
   - component: {fileID: 546245698822374914}
+  - component: {fileID: -6996866736346832838}
   m_Layer: 0
   m_Name: PurpleTower
   m_TagString: Untagged
@@ -74,6 +75,54 @@ MonoBehaviour:
   rotationSpeed: 5
   towerHead: {fileID: 826014129295124261}
   currentTarget: {fileID: 0}
+--- !u!114 &-6996866736346832838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 492350520629160744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a963ddc15f9dedb44920f6865ceb9e0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerShooter
+  projectilePrefab: {fileID: 5981346103648283331, guid: 3c87eba14e9512d458d23a999fe32e8f, type: 3}
+  firePoint: {fileID: 6019936428849369868}
+  fireRate: 1
+  projectileSpeed: 15
+  damage: 10
+--- !u!1 &2182585456205983067
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6019936428849369868}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6019936428849369868
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2182585456205983067}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.6, z: 1.3999939}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 826014129295124261}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3950065215400793887
 GameObject:
   m_ObjectHideFlags: 0
@@ -107,6 +156,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6797030631589741272}
+  - {fileID: 6019936428849369868}
   m_Father: {fileID: 4007973430043241712}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6476671761397537066
