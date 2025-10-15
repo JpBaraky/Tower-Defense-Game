@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4893392654497550604}
   - component: {fileID: 1010246996609701717}
+  - component: {fileID: -8461716138496484042}
   m_Layer: 0
   m_Name: Wood Monster
   m_TagString: Untagged
@@ -48,6 +49,22 @@ MonoBehaviour:
   speed: 1
   useOptimalPath: 0
   nextNode: {fileID: 0}
+--- !u!114 &-8461716138496484042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287413184781287655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b20b609b53f0a44b588aacde6dc9cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  maxHealth: 100
+  currentHealth: 100
+  moveSpeed: 2
+  pathProgress: 0
 --- !u!1 &2518714384462551039
 GameObject:
   m_ObjectHideFlags: 0
@@ -148,6 +165,8 @@ GameObject:
   - component: {fileID: 7766488515408077141}
   - component: {fileID: 2117675553098837644}
   - component: {fileID: 4070728428484311459}
+  - component: {fileID: 3307611609090552012}
+  - component: {fileID: 1943000316943499820}
   m_Layer: 0
   m_Name: Wood Monster
   m_TagString: Untagged
@@ -226,6 +245,54 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &3307611609090552012
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8724496182405452480}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.020047823, y: 0.028475713, z: 0.020047408}
+  m_Center: {x: 0.0000006156042, y: -0.0020481753, z: -0.0000017285347}
+--- !u!54 &1943000316943499820
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8724496182405452480}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 1
 --- !u!1 &9055542256382741628
 GameObject:
   m_ObjectHideFlags: 0
