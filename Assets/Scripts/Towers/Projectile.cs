@@ -25,7 +25,7 @@ public class Projectile : MonoBehaviour
         transform.position += dir * speed * Time.deltaTime;
         transform.rotation = Quaternion.LookRotation(dir);
 
-        if (Vector3.Distance(transform.position, target.position) < 0.3f)
+        if (Vector3.Distance(transform.position, target.position) < 0.05f)
         {
             HitTarget();
         }

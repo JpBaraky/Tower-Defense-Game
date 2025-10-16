@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
-        // Disable enemy when dead
-        gameObject.SetActive(false);
+      
+        Destroy(gameObject);
     }
 }

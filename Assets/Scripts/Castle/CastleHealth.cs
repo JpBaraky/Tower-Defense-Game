@@ -13,6 +13,10 @@ public class CastleHealth : MonoBehaviour
         currentHealth = maxHealth;
         healthText.text = currentHealth.ToString();
     }
+    void Update()
+    {
+          healthText.text = currentHealth.ToString();
+    }
 
     public void TakeDamage(int amount)
     {
