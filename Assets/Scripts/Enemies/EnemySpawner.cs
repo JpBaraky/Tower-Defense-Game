@@ -4,32 +4,43 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;      // Enemy to spawn
-    public Transform spawnPoint;        // Where enemies appear
-    public int maxEnemies = 5;          // Max alive at once
-    public float spawnInterval = 3f;    // Seconds between spawns
+    public GameObject enemyPrefab;
+    public Transform spawnPoint;
 
     private List<GameObject> aliveEnemies = new List<GameObject>();
 
-    void Start()
+    // Called by WaveManager
+    public IEnumerator SpawnWave(Wave wave)
     {
-        StartCoroutine(SpawnRoutine());
-    }
+        aliveEnemies.Clear();
 
-    IEnumerator SpawnRoutine()
-    {
-        while (true)
+        for (int i = 0; i < wave.enemyCount; i++)
         {
-            // Remove destroyed enemies from the list
-            aliveEnemies.RemoveAll(e => e == null);
-
-            if (aliveEnemies.Count < maxEnemies)
+            if (enemyPrefab == null || spawnPoint == null)
             {
-                GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
-                aliveEnemies.Add(enemy);
+                Debug.LogError("EnemySpawner: Missing enemyPrefab or spawnPoint reference!");
+                yield break;
             }
 
-            yield return new WaitForSeconds(spawnInterval);
+            GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+            aliveEnemies.Add(enemy);
+
+            // Apply scaling from the wave data
+            Enemy enemyScript = enemy.GetComponent<Enemy>();
+            if (enemyScript != null)
+            {
+                enemyScript.maxHealth *= wave.enemyHealthMultiplier;
+                enemyScript.currentHealth = enemyScript.maxHealth;
+                enemyScript.moveSpeed *= wave.enemySpeedMultiplier;
+            }
+
+            yield return new WaitForSeconds(wave.spawnInterval);
         }
+    }
+
+    public bool HasAliveEnemies()
+    {
+        aliveEnemies.RemoveAll(e => e == null);
+        return aliveEnemies.Count > 0;
     }
 }
