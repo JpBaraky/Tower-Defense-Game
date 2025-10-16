@@ -119,7 +119,7 @@ public class TowerPlacement : MonoBehaviour
                 if (col != null) col.enabled = false;
 
                 previewRenderer = previewTower.GetComponentInChildren<Renderer>();
-                previewTower.transform.localScale += new Vector3(0.01f, 0.01f, 0.01f);
+                previewTower.transform.localScale += new Vector3(0.02f, 0.02f, 0.02f);
                 if (previewRenderer != null) previewRenderer.enabled = false;
             
         
