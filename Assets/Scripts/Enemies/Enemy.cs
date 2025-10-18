@@ -6,7 +6,8 @@ public class Enemy : MonoBehaviour
     public float maxHealth = 100f;
     public float currentHealth = 100f;
     public float moveSpeed = 2f;
-
+    public float rewardGold = 5f;
+    
     [Header("Optional Path Progress")]
     public float pathProgress; // useful for "First" targeting logic later
 
@@ -26,7 +27,11 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
-      
+        TowerPlacement playerEconomy = FindFirstObjectByType<TowerPlacement>();
+        if (playerEconomy != null)
+        {
+            playerEconomy.AddGold(Mathf.RoundToInt(rewardGold));
+        }
         Destroy(gameObject);
     }
 }

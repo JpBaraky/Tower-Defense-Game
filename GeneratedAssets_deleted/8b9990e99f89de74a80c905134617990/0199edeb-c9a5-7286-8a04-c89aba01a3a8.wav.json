@@ -1,0 +1,13 @@
+{
+    "asset": "8b9990e99f89de74a80c905134617990",
+    "fileName": "0199edeb-c9a5-7286-8a04-c89aba01a3a8.wav",
+    "prompt": "sound for a tower defense game of a tower shooting, like a gentle pop, that will be repeated several times in a row, ",
+    "negativePrompt": "voice, noise, distorted, speak",
+    "model": "0ee39b33-2893-4e0f-8c46-0e0bdd4eda85",
+    "modelName": "Text to Sound",
+    "customSeed": -1,
+    "w3CTraceId": "cc965e59ffda9258ad1405f99de56e84",
+    "duration": 1.6109791994094849,
+    "autoTrim": true,
+    "hasReference": true
+}

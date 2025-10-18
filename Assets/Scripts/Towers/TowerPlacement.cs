@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
@@ -7,16 +8,22 @@ public class TowerPlacement : MonoBehaviour
 {
     [Header("References")]
     public Camera mainCamera;
-    public Tilemap tilemap;         // Main tilemap for tower placement
-    public Tilemap pathTilemap;     // Tilemap that holds the path
+    public Tilemap tilemap;
+    public Tilemap pathTilemap;
     public GameObject towerPrefab;
-    public BillboardSprite billboardManager; // reference to your billboard manager
+    public BillboardSprite billboardManager;
+
+    [Header("Economy")]
+    public int startingGold = 100;
+    public TextMeshProUGUI goldDisplay;
+    public int currentGold;
+    [Range(0f, 1f)] public float towerSellMultiplier = 0.5f;
 
     [Header("Preview Colors")]
     public Color validColor = new Color(0f, 1f, 0f, 0.6f);
     public Color invalidColor = new Color(1f, 0f, 0f, 0.6f);
-    [Range(0f, 5f)] public float pulseSpeed = 2f; // speed of pulsing effect
-    [Range(0f, 1f)] public float pulseStrength = 0.3f; // how strong the pulse is
+    [Range(0f, 5f)] public float pulseSpeed = 2f;
+    [Range(0f, 1f)] public float pulseStrength = 0.3f;
 
     public GameObject previewTower;
     private Renderer[] previewRenderers;
@@ -25,6 +32,9 @@ public class TowerPlacement : MonoBehaviour
 
     void Start()
     {
+        currentGold = startingGold;
+        Debug.Log("Starting Gold: " + currentGold);
+
         if (mainCamera == null) mainCamera = Camera.main;
         if (tilemap == null)
         {
@@ -39,6 +49,7 @@ public class TowerPlacement : MonoBehaviour
 
     void Update()
     {
+        goldDisplay.text = currentGold.ToString();
         if (!canPlaceTower)
         {
             if (previewRenderers != null)
@@ -72,32 +83,70 @@ public class TowerPlacement : MonoBehaviour
 
             if (previewRenderers != null)
             {
-                // Add pulsing alpha effect
                 float pulse = (Mathf.Sin(Time.time * pulseSpeed) * 0.5f + 0.5f) * pulseStrength;
-                Color baseColor = (occupied) ? invalidColor : validColor;
+
+                Color baseColor;
+                if (occupied)
+                    baseColor = invalidColor;
+                else
+                {
+                    int towerPrice = towerPrefab.GetComponent<TowerPrice>().price;
+                    baseColor = (currentGold >= towerPrice) ? validColor : invalidColor;
+                }
+
                 Color pulsingColor = baseColor * (1f + pulse);
-                pulsingColor.a = baseColor.a; // preserve transparency
+                pulsingColor.a = baseColor.a;
 
                 foreach (var rend in previewRenderers)
-                {
                     if (rend != null && rend.material != null)
                         rend.material.color = pulsingColor;
-                }
             }
         }
 
         // Place tower
         if (Mouse.current.leftButton.wasPressedThisFrame && !occupied)
         {
-            GameObject newTower = Instantiate(towerPrefab, cellCenter, Quaternion.identity);
+            int towerPrice = towerPrefab.GetComponent<TowerPrice>().price;
+
+            if (currentGold >= towerPrice)
+            {
+                currentGold -= towerPrice;
+                Debug.Log("Bought tower for " + towerPrice + " gold. Remaining: " + currentGold);
+
+                GameObject newTower = Instantiate(towerPrefab, cellCenter, Quaternion.identity);
+                occupiedTiles[cell] = true;
+
+                if (billboardManager != null)
+                    billboardManager.RegisterSprite(newTower.transform);
+            }
+            else
+            {
+                Debug.Log("Not enough gold to place tower. You have: " + currentGold);
+            }
 
             if (!Keyboard.current.shiftKey.isPressed || Keyboard.current.shiftKey.wasReleasedThisFrame)
                 canPlaceTower = false;
+        }
 
-            occupiedTiles[cell] = true;
+        // Sell tower
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
+            {
+                TowerPrice tower = hit.collider.GetComponent<TowerPrice>();
+                if (tower != null)
+                {
+                    int refund = Mathf.RoundToInt(tower.price * towerSellMultiplier);
+                    currentGold += refund;
+                    Debug.Log("Sold tower for " + refund + " gold. Current gold: " + currentGold);
 
-            if (billboardManager != null)
-                billboardManager.RegisterSprite(newTower.transform);
+                    Vector3Int towerCell = tilemap.WorldToCell(tower.transform.position);
+                    occupiedTiles[towerCell] = false;
+
+                    Destroy(tower.gameObject);
+                }
+            }
         }
     }
 
@@ -109,7 +158,6 @@ public class TowerPlacement : MonoBehaviour
 
     public void UpdatePreview()
     {
-        // Clean old previews
         foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Preview"))
             Destroy(obj);
 
@@ -120,19 +168,17 @@ public class TowerPlacement : MonoBehaviour
         Collider col = previewTower.GetComponent<Collider>();
         if (col != null) col.enabled = false;
 
-        // Get all renderers
         previewRenderers = previewTower.GetComponentsInChildren<Renderer>();
         foreach (var rend in previewRenderers)
         {
             if (rend == null) continue;
-            rend.material = new Material(rend.material); // make unique instance
+            rend.material = new Material(rend.material);
             rend.enabled = false;
         }
 
         previewTower.transform.localScale += new Vector3(0.01f, 0.01f, 0.01f);
     }
 
-    // Call this in Start() to mark all small tiles under path hexes
     void MarkPathOnSmallTiles()
     {
         foreach (var bigCell in pathTilemap.cellBounds.allPositionsWithin)
@@ -140,10 +186,9 @@ public class TowerPlacement : MonoBehaviour
             if (pathTilemap.GetTile(bigCell) == null) continue;
 
             Vector3 worldCenter = pathTilemap.GetCellCenterWorld(bigCell);
-            float bigHexSize = pathTilemap.layoutGrid.cellSize.x * 0.5f; // approximate hex radius
+            float bigHexSize = pathTilemap.layoutGrid.cellSize.x * 0.5f;
             Bounds hexBounds = new Bounds(worldCenter, Vector3.one * bigHexSize * 2f);
 
-            // Determine range in small tile cells to check
             Vector3Int minCell = tilemap.WorldToCell(hexBounds.min);
             Vector3Int maxCell = tilemap.WorldToCell(hexBounds.max);
 
@@ -153,12 +198,15 @@ public class TowerPlacement : MonoBehaviour
                 {
                     Vector3Int smallCell = new(x, y, 0);
                     Vector3 cellCenter = tilemap.GetCellCenterWorld(smallCell);
-
-                    // Only mark if inside the big hex radius
                     if (Vector3.Distance(cellCenter, worldCenter) <= bigHexSize * 0.95f)
                         occupiedTiles[smallCell] = true;
                 }
             }
         }
+    }
+    public void AddGold(int amount)
+    {
+        currentGold += amount;
+        Debug.Log("Gained " + amount + " gold. Current gold: " + currentGold);
     }
 }
