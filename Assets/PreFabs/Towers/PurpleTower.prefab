@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 492350520629160744}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.8968942, y: 0, z: -9.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -72,9 +72,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerTargeting
   targetMode: 0
-  range: 2
+  range: 3
   rotateTowardsTarget: 1
-  rotationSpeed: 5
+  rotationSpeed: 3
   towerHead: {fileID: 826014129295124261}
   currentTarget: {fileID: 0}
 --- !u!114 &-6996866736346832838
@@ -91,11 +91,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerShooter
   projectilePrefab: {fileID: 5981346103648283331, guid: 3c87eba14e9512d458d23a999fe32e8f, type: 3}
   firePoint: {fileID: 6019936428849369868}
-  fireRate: 1
-  projectileSpeed: 15
+  fireRate: 5
+  projectileSpeed: 5
   damage: 10
-  shootClip: {fileID: 0}
-  shootVolume: 1
+  shootClip: {fileID: 8300000, guid: 996b0373e22da2d48903d28e940592a6, type: 3}
+  shootVolume: 0.2
 --- !u!82 &328541792927435924
 AudioSource:
   m_ObjectHideFlags: 0
@@ -107,10 +107,10 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_Resource: {fileID: 8300000, guid: 996b0373e22da2d48903d28e940592a6, type: 3}
+  m_PlayOnAwake: 0
   m_Volume: 1
-  m_Pitch: 1
+  m_Pitch: 3
   Loop: 0
   Mute: 0
   Spatialize: 0

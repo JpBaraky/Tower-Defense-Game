@@ -9,7 +9,7 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"picker_window_position_offset.00000000" = "116;163;320;550"
+	"picker_window_position_offset.00000000" = "78;163;320;550"
 	"picker_visibility_flags.00000000" = "0"
 	"picker_item_size.00000000" = "1"
 	"picker_inspector.00000000" = "0"
@@ -63,6 +63,16 @@ providers = {
 	log = {
 		active = false
 		priority = 210
+		defaultAction = null
+	}
+	"unity.ai.pattern.search" = {
+		active = true
+		priority = 80
+		defaultAction = null
+	}
+	"unity.ai.file.search" = {
+		active = true
+		priority = 85
 		defaultAction = null
 	}
 }

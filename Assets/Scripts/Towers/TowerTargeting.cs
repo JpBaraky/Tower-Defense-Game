@@ -108,13 +108,24 @@ public class TowerTargeting : MonoBehaviour
                 Debug.Log($"Enemy exited: {e.name}");
         }
     }
-    
+
 
 #if UNITY_EDITOR
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, range);
+
+        int segments = 64; // more segments = smoother circle
+        float angleStep = 360f / segments;
+        Vector3 prevPoint = transform.position + new Vector3(range, 0, 0);
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = angleStep * i * Mathf.Deg2Rad;
+            Vector3 nextPoint = transform.position + new Vector3(Mathf.Cos(angle) * range, 0, Mathf.Sin(angle) * range);
+            Gizmos.DrawLine(prevPoint, nextPoint);
+            prevPoint = nextPoint;
+        }
     }
 #endif
 }

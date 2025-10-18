@@ -355,8 +355,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBounce
   swayAmount: 0.001
-  swaySpeed: 0
-  bounceHeight: 0.001
+  swaySpeed: 0.1
+  bounceHeight: 0
 --- !u!114 &6749549839713728374
 MonoBehaviour:
   m_ObjectHideFlags: 0
