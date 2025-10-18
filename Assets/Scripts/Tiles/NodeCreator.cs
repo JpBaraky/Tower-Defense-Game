@@ -212,7 +212,7 @@ mainPath.Clear();
             if (node == null) continue;
 
             Gizmos.color = Color.Lerp(Color.blue, Color.red, i / (float)(mainPath.Count - 1));
-            Gizmos.DrawSphere(node.transform.position, 0.05f);
+            Gizmos.DrawSphere(node.transform.position, 0.09f);
 
 #if UNITY_EDITOR
             Handles.Label(node.transform.position + Vector3.up * 0.2f, node.number.ToString());
