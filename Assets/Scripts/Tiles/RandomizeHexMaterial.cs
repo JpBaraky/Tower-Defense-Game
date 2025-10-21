@@ -4,55 +4,82 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer))]
 public class RandomizeHexMaterial : MonoBehaviour
 {
+    [Header("Randomization Settings")]
     [Range(0f, 1f)] public float randomizeOnStartChance = 1f;
     public Vector2 tilingRange = new Vector2(0.8f, 1.2f);
     public Vector2 offsetRange = new Vector2(0f, 1f);
     public bool randomizeRotation = true;
 
-    private Material runtimeMat; // Unique material instance for this object
+    private Material previewMat;   // Editor preview material (not saved)
+    private Material runtimeMat;   // Runtime instance (for play mode only)
+    private Renderer rend;
 
     void OnEnable()
     {
-        ApplyRandomization();
+        rend = GetComponent<Renderer>();
+        if (rend == null || rend.sharedMaterial == null)
+            return;
+
+        if (Application.isPlaying)
+            ApplyRuntimeRandomization();
+        else
+            ApplyEditorPreview();
     }
 
     void OnDisable()
     {
-        // Clean up to avoid material leaks in Editor
-        if (!Application.isPlaying && runtimeMat != null)
+        // Clean up only runtime material (not prefab safe)
+        if (Application.isPlaying && runtimeMat != null)
         {
-            DestroyImmediate(runtimeMat);
+            Destroy(runtimeMat);
             runtimeMat = null;
         }
     }
 
-    void ApplyRandomization()
+    // ---------- RUNTIME ----------
+    void ApplyRuntimeRandomization()
     {
-        var renderer = GetComponent<Renderer>();
-        if (renderer == null || renderer.sharedMaterial == null)
-            return;
+        // Unity automatically creates a unique material when using .material
+        runtimeMat = rend.material;
+        RandomizeMaterial(runtimeMat);
+    }
 
-        // Create a new instance of the shared material
-        if (runtimeMat == null)
+    // ---------- EDITOR ----------
+    void ApplyEditorPreview()
+    {
+        // Avoid creating infinite preview copies
+        if (previewMat == null)
         {
-            runtimeMat = new Material(renderer.sharedMaterial);
-            renderer.sharedMaterial = runtimeMat;
+            previewMat = new Material(rend.sharedMaterial)
+            {
+                name = rend.sharedMaterial.name + " (Preview)"
+            };
         }
+
+        rend.sharedMaterial = previewMat;
+        RandomizeMaterial(previewMat);
+    }
+
+    // ---------- COMMON LOGIC ----------
+    void RandomizeMaterial(Material mat)
+    {
+        if (Random.value > randomizeOnStartChance || mat == null)
+            return;
 
         // Random tiling
         float tilingX = Random.Range(tilingRange.x, tilingRange.y);
-        float tilingY = tilingX; // Uniform scaling for hex tiles
-        runtimeMat.mainTextureScale = new Vector2(tilingX, tilingY);
+        float tilingY = tilingX;
+        mat.mainTextureScale = new Vector2(tilingX, tilingY);
 
         // Random offset
         float offsetX = Random.Range(offsetRange.x, offsetRange.y);
         float offsetY = Random.Range(offsetRange.x, offsetRange.y);
-        runtimeMat.mainTextureOffset = new Vector2(offsetX, offsetY);
+        mat.mainTextureOffset = new Vector2(offsetX, offsetY);
 
-        // Random rotation (if shader supports it)
-        if (randomizeRotation && runtimeMat.HasProperty("_Rotation"))
+        // Random rotation if supported
+        if (randomizeRotation && mat.HasProperty("_Rotation"))
         {
-            runtimeMat.SetFloat("_Rotation", Random.Range(0f, 360f));
+            mat.SetFloat("_Rotation", Random.Range(0f, 360f));
         }
     }
 }

@@ -43,7 +43,7 @@ public class PathGenerator : MonoBehaviour
             // Pick random prefab
             PathPiece prefab = pathPrefabs[Random.Range(0, pathPrefabs.Length)];
             PathPiece newPiece = Instantiate(prefab);
-            newPiece.Awake();
+          
 
             bool fits = false;
 

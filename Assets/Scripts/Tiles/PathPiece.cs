@@ -1,24 +1,34 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// Represents one hexagonal path segment prefab.
+/// Each piece can have one or more entrance/exit points,
+/// which the generator uses to connect paths.
+/// </summary>
 public class PathPiece : MonoBehaviour
 {
-    [HideInInspector] public List<Transform> exits = new();
+    [Header("Connections")]
+    // Points where enemies can enter the tile
+    public List<Transform> entrances = new List<Transform>();
 
-    public void Awake()
-    {
-        exits.Clear();
-        foreach (Transform child in transform)
-        {
-            if (child.CompareTag("Exit")) // mark your exit objects with "Exit" tag
-                exits.Add(child);
-        }
-    }
+    // Points where enemies can leave the tile
+    public List<Transform> exits = new List<Transform>();
 
-    void OnDrawGizmos()
+    [Header("Visuals (optional)")]
+    public GameObject pathVisual; // optional visual element
+
+    private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
-        foreach (var exit in exits)
-            Gizmos.DrawSphere(exit.position, 0.1f);
+        // Show entrances in green, exits in red
+        Gizmos.color = Color.green;
+        foreach (var e in entrances)
+            if (e != null)
+                Gizmos.DrawSphere(e.position, 0.05f);
+
+        Gizmos.color = Color.red;
+        foreach (var e in exits)
+            if (e != null)
+                Gizmos.DrawSphere(e.position, 0.05f);
     }
 }

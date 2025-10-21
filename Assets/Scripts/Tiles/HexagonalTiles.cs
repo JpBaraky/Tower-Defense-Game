@@ -20,15 +20,12 @@ public class HexagonalTiles : MonoBehaviour
 #if UNITY_EDITOR
     private GameObject parentContainer;
     private readonly Dictionary<Vector3Int, GameObject> spawnedObjects = new();
-    private HashSet<Vector3Int> previousTiles = new();
     private bool needsUpdate = false;
 
     private void OnEnable()
     {
         SceneView.duringSceneGui += OnSceneGUI;
         EditorApplication.update += OnEditorUpdate;
-
-        // Subscribe to the global Tilemap event
         Tilemap.tilemapTileChanged += OnTilemapChanged;
     }
 
@@ -36,14 +33,7 @@ public class HexagonalTiles : MonoBehaviour
     {
         SceneView.duringSceneGui -= OnSceneGUI;
         EditorApplication.update -= OnEditorUpdate;
-
         Tilemap.tilemapTileChanged -= OnTilemapChanged;
-    }
-
-    private void Start()
-    {
-        EnsureParent();
-        UpdateTiles();
     }
 
     private void OnSceneGUI(SceneView sceneView)
@@ -51,17 +41,8 @@ public class HexagonalTiles : MonoBehaviour
         Event e = Event.current;
         if (e != null && e.type == EventType.MouseUp)
         {
-            UpdateTiles();
+            UpdateTilesFull();
         }
-    }
-
-    private void OnTilemapChanged(Tilemap tilemap, Tilemap.SyncTile[] changes)
-    {
-        // Only react if this is our source tilemap
-        if (sourceTilemap == null || tilemap != sourceTilemap)
-            return;
-
-        needsUpdate = true;
     }
 
     private void OnEditorUpdate()
@@ -69,8 +50,21 @@ public class HexagonalTiles : MonoBehaviour
         if (needsUpdate)
         {
             needsUpdate = false;
-            UpdateTiles();
+            UpdateTilesFull();
         }
+    }
+
+    private void OnTilemapChanged(Tilemap tilemap, Tilemap.SyncTile[] changes)
+    {
+        if (tilemap != sourceTilemap) return;
+        needsUpdate = true;
+    }
+
+    private void Start()
+    {
+        EnsureParent();
+        RebuildSpawnedObjects(); // Prevent duplicates at start
+        UpdateTilesFull();
     }
 
     private void EnsureParent()
@@ -83,7 +77,7 @@ public class HexagonalTiles : MonoBehaviour
     }
 
     [ContextMenu("Sync Now")]
-    public void UpdateTiles()
+    public void UpdateTilesFull()
     {
         if (sourceTilemap == null || targetTilemap == null || prefabToSpawn == null)
             return;
@@ -94,41 +88,129 @@ public class HexagonalTiles : MonoBehaviour
         HashSet<Vector3Int> currentTiles = new();
         sourceTilemap.GetUsedTiles(currentTiles);
 
-        // Clear removed ones
+        // Remove objects for tiles no longer present
         if (clearOldObjects)
         {
             foreach (var pos in new List<Vector3Int>(spawnedObjects.Keys))
             {
                 if (!currentTiles.Contains(pos))
-                {
-                    if (spawnedObjects[pos] != null)
-                        DestroyImmediate(spawnedObjects[pos]);
-                    spawnedObjects.Remove(pos);
-                }
+                    RemoveTile(pos);
             }
         }
 
-        // Spawn new ones
+        // Spawn or keep tiles
         foreach (var pos in currentTiles)
         {
-            if (spawnedObjects.ContainsKey(pos)) continue;
-
-            Vector3 worldPos = sourceTilemap.GetCellCenterWorld(pos);
-            Vector3 targetWorld = targetTilemap.GetCellCenterWorld(targetTilemap.WorldToCell(worldPos));
-            Vector3 finalPos = targetWorld + offset;
-
-            GameObject obj = (GameObject)PrefabUtility.InstantiatePrefab(prefabToSpawn);
-            obj.transform.position = finalPos;
-            obj.transform.rotation = Quaternion.Euler(rotation);
-            obj.transform.SetParent(parentContainer.transform, true);
-
-            spawnedObjects[pos] = obj;
+            SpawnOrKeep(pos);
         }
 
         EditorUtility.SetDirty(parentContainer);
-        previousTiles = currentTiles;
+    }
+
+    private void SpawnOrKeep(Vector3Int pos)
+    {
+        GameObject existing = null;
+        spawnedObjects.TryGetValue(pos, out existing);
+
+        // If a Path object is already at this cell, reuse it
+        if (existing != null && existing.CompareTag("Path"))
+        {
+            spawnedObjects[pos] = existing;
+            return;
+        }
+
+        // If a non-Path object is already there, reuse it
+        if (existing != null)
+        {
+            spawnedObjects[pos] = existing;
+            return;
+        }
+
+        // Check for any Path object in children at this cell
+        GameObject pathObj = FindPathObjectAtCell(pos);
+        if (pathObj != null)
+        {
+            spawnedObjects[pos] = pathObj;
+            return;
+        }
+
+        // Spawn new prefab
+        GameObject obj = (GameObject)PrefabUtility.InstantiatePrefab(prefabToSpawn);
+        if (obj == null) return;
+
+        Vector3 worldPos = targetTilemap.GetCellCenterWorld(pos) + offset;
+        obj.transform.position = worldPos;
+        obj.transform.rotation = Quaternion.Euler(rotation);
+        obj.transform.SetParent(parentContainer.transform, true);
+
+        var info = obj.GetComponent<SpawnedTileInfo>() ?? obj.AddComponent<SpawnedTileInfo>();
+        info.sourceTilemap = sourceTilemap;
+
+        spawnedObjects[pos] = obj;
+    }
+
+    private void RemoveTile(Vector3Int pos)
+    {
+        if (!spawnedObjects.TryGetValue(pos, out GameObject obj)) return;
+
+        spawnedObjects.Remove(pos);
+
+        if (obj != null)
+        {
+            var info = obj.GetComponent<SpawnedTileInfo>();
+            if (info != null && info.sourceTilemap == sourceTilemap)
+            {
+                DestroyImmediate(obj);
+            }
+        }
+    }
+
+    private void RebuildSpawnedObjects()
+    {
+        spawnedObjects.Clear();
+
+        foreach (Transform child in parentContainer.transform)
+        {
+            if (child == null) continue;
+
+            Vector3Int cellPos = targetTilemap.WorldToCell(child.position);
+            var info = child.GetComponent<SpawnedTileInfo>();
+
+            if (info != null && info.sourceTilemap == sourceTilemap)
+            {
+                if (!spawnedObjects.ContainsKey(cellPos))
+                    spawnedObjects[cellPos] = child.gameObject;
+                else
+                {
+                    // Prefer Path object over non-Path
+                    if (!spawnedObjects[cellPos].CompareTag("Path") && child.CompareTag("Path"))
+                        spawnedObjects[cellPos] = child.gameObject;
+                    else
+                        DestroyImmediate(child.gameObject);
+                }
+            }
+        }
+    }
+
+    private GameObject FindPathObjectAtCell(Vector3Int cellPos)
+    {
+        foreach (Transform child in parentContainer.transform)
+        {
+            if (child == null) continue;
+
+            Vector3Int childCell = targetTilemap.WorldToCell(child.position);
+            if (childCell == cellPos && child.CompareTag("Path"))
+                return child.gameObject;
+        }
+        return null;
     }
 #endif
+}
+
+// Helper component to track which tilemap a prefab belongs to
+public class SpawnedTileInfo : MonoBehaviour
+{
+    public Tilemap sourceTilemap;
 }
 
 #if UNITY_EDITOR
