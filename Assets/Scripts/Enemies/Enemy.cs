@@ -5,7 +5,7 @@ public class Enemy : MonoBehaviour
     [Header("Stats")]
     public float maxHealth = 100f;
     public float currentHealth = 100f;
-    public float moveSpeed = 2f;
+    public float moveSpeed = 0.5f;
     public float rewardGold = 5f;
     
     [Header("Optional Path Progress")]
