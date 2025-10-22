@@ -18,48 +18,48 @@ MonoBehaviour:
         serializedData:
         - key: 0
           value:
-            rid: 688844527335637343
+            rid: 688844549806358960
         - key: 1
           value:
-            rid: 688844527335637344
+            rid: 688844549806358961
         - key: 2
           value:
-            rid: 688844527335637345
+            rid: 688844549806358962
         - key: 3
           value:
-            rid: 688844527335637346
+            rid: 688844549806358963
         - key: 4
           value:
-            rid: 688844527335637347
+            rid: 688844549806358964
         - key: 5
           value:
-            rid: 688844527335637348
+            rid: 688844549806358965
       previewSettings:
         sizeFactor: 1
   references:
     version: 2
     RefIds:
-    - rid: 688844527335637343
+    - rid: 688844549806358960
       type: {class: ModelSelection, ns: Unity.AI.Image.Services.Stores.States, asm: Unity.AI.Image}
       data:
         modelID: 94c4260f-b988-40e7-b3d3-435b9f449bd0
-    - rid: 688844527335637344
+    - rid: 688844549806358961
       type: {class: ModelSelection, ns: Unity.AI.Image.Services.Stores.States, asm: Unity.AI.Image}
       data:
         modelID: 
-    - rid: 688844527335637345
+    - rid: 688844549806358962
       type: {class: ModelSelection, ns: Unity.AI.Image.Services.Stores.States, asm: Unity.AI.Image}
       data:
         modelID: 94c4260f-b988-40e7-b3d3-435b9f449bd0
-    - rid: 688844527335637346
+    - rid: 688844549806358963
       type: {class: ModelSelection, ns: Unity.AI.Image.Services.Stores.States, asm: Unity.AI.Image}
       data:
         modelID: 2d2d53fc-e209-4853-a358-738191781d9c
-    - rid: 688844527335637347
+    - rid: 688844549806358964
       type: {class: ModelSelection, ns: Unity.AI.Image.Services.Stores.States, asm: Unity.AI.Image}
       data:
         modelID: 
-    - rid: 688844527335637348
+    - rid: 688844549806358965
       type: {class: ModelSelection, ns: Unity.AI.Image.Services.Stores.States, asm: Unity.AI.Image}
       data:
         modelID: 

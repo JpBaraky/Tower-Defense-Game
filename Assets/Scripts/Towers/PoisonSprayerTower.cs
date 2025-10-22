@@ -4,7 +4,7 @@ using UnityEngine;
 
 [ExecuteAlways]
 [RequireComponent(typeof(TowerTargeting))]
-public class FlamethrowerTower : MonoBehaviour
+public class PoisonSprayerTower : MonoBehaviour
 {
     [Header("Cone Settings")]
     [Range(20, 90)] public float coneAngle = 45f;
@@ -12,27 +12,27 @@ public class FlamethrowerTower : MonoBehaviour
 
     [Header("Damage Settings")]
     public float towerDamage = 20f;
-    public bool applyBurn = true;
-    public float burnDamage = 5f;
-    public float burnDuration = 2f;
+    public bool applyPoison = true;
+    public float poisonDamage = 5f;
+    public float poisonDuration = 2f;
     public float damageInterval = 0.1f;
-
-
+    public float poisonVFXFadeTime = 0.5f; // Duration for VFX to fade
 
     [Header("Visuals")]
-    public ParticleSystem flameEffect;
-    public GameObject burnEffectPrefab;
+    public ParticleSystem poisonEffect;
+    public GameObject poisonEffectPrefab;
 
     private TowerTargeting targeting;
     private float damageTimer;
 
-    private class BurnInfo
+    private class PoisonInfo
     {
         public float timeLeft;
-        public GameObject fireVFX;
+        public GameObject poisonVFX;
+        public Coroutine fadeCoroutine;
     }
 
-    private readonly Dictionary<Enemy, BurnInfo> burningEnemies = new();
+    private readonly Dictionary<Enemy, PoisonInfo> poisonedEnemies = new();
 
     private void Awake()
     {
@@ -52,21 +52,23 @@ public class FlamethrowerTower : MonoBehaviour
 
         if (target == null)
         {
-            StopFlame();
-            return;
+            StopPoison();
         }
-
-        if (flameEffect != null && !flameEffect.isPlaying)
-            flameEffect.Play();
-
-        damageTimer += Time.deltaTime;
-        if (damageTimer >= damageInterval)
+        else
         {
-            ApplyConeDamage();
-            damageTimer = 0f;
+            if (poisonEffect != null && !poisonEffect.isPlaying)
+                poisonEffect.Play();
+
+            damageTimer += Time.deltaTime;
+            if (damageTimer >= damageInterval)
+            {
+                ApplyConeDamage();
+                damageTimer = 0f;
+            }
         }
 
-        UpdateBurningEnemies();
+        // Always update poisoned enemies to remove expired VFX
+        UpdatePoisonedEnemies();
     }
 
     private void ApplyConeDamage()
@@ -90,75 +92,113 @@ public class FlamethrowerTower : MonoBehaviour
 
             e.TakeDamage(towerDamage * damageInterval);
 
-            if (applyBurn)
+            if (applyPoison)
             {
-                if (burningEnemies.TryGetValue(e, out var info))
+                if (poisonedEnemies.TryGetValue(e, out var info))
                 {
-                    info.timeLeft = burnDuration;
+                    info.timeLeft = poisonDuration; // Refresh poison duration
                 }
                 else
                 {
                     GameObject fx = null;
-                    if (burnEffectPrefab)
+                    if (poisonEffectPrefab)
                     {
-                        fx = Instantiate(burnEffectPrefab, e.transform);
-                       // fx.transform.localPosition = Vector3.up * 1f;
+                        fx = Instantiate(poisonEffectPrefab, e.transform);
+                        fx.transform.localPosition = Vector3.zero;
                     }
 
-                    burningEnemies[e] = new BurnInfo
+                    poisonedEnemies[e] = new PoisonInfo
                     {
-                        timeLeft = burnDuration,
-                        fireVFX = fx
+                        timeLeft = poisonDuration,
+                        poisonVFX = fx,
+                        fadeCoroutine = null
                     };
                 }
             }
         }
     }
 
-    private void UpdateBurningEnemies()
+    private void UpdatePoisonedEnemies()
     {
-        if (burningEnemies.Count == 0) return;
+        if (poisonedEnemies.Count == 0) return;
 
         List<Enemy> toRemove = new();
 
-        foreach (var kvp in burningEnemies)
+        foreach (var kvp in poisonedEnemies)
         {
             Enemy e = kvp.Key;
-            BurnInfo info = kvp.Value;
+            PoisonInfo info = kvp.Value;
+
+            bool removeEnemy = false;
 
             if (e == null || !e.isActiveAndEnabled)
             {
-                if (info.fireVFX) Destroy(info.fireVFX);
-                toRemove.Add(e);
-                continue;
+                removeEnemy = true;
+            }
+            else
+            {
+                e.TakeDamage(poisonDamage * Time.deltaTime);
+                info.timeLeft -= Time.deltaTime;
+
+                if (info.timeLeft <= 0)
+                    removeEnemy = true;
             }
 
-            e.TakeDamage(burnDamage * Time.deltaTime);
-            info.timeLeft -= Time.deltaTime;
-
-            if (info.timeLeft <= 0)
+            if (removeEnemy)
             {
-                if (info.fireVFX) Destroy(info.fireVFX);
+                if (info.poisonVFX != null)
+                {
+                    if (info.fadeCoroutine != null)
+                        StopCoroutine(info.fadeCoroutine);
+
+                    info.fadeCoroutine = StartCoroutine(FadeAndDestroy(info.poisonVFX, poisonVFXFadeTime));
+                    info.poisonVFX = null;
+                }
+
                 toRemove.Add(e);
             }
         }
 
         foreach (var e in toRemove)
-            burningEnemies.Remove(e);
+            poisonedEnemies.Remove(e);
+
+        if (poisonedEnemies.Count == 0 && poisonEffect != null && poisonEffect.isPlaying)
+            poisonEffect.Stop();
     }
 
-    private void StopFlame()
+    private IEnumerator FadeAndDestroy(GameObject vfx, float duration)
     {
-        if (flameEffect != null && flameEffect.isPlaying)
-            flameEffect.Stop();
+        if (vfx == null) yield break;
+
+        ParticleSystem ps = vfx.GetComponent<ParticleSystem>();
+        float elapsed = 0f;
+
+        if (ps != null)
+        {
+            var main = ps.main;
+            float startRate = main.startLifetime.constant;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        Destroy(vfx);
     }
 
-    // --- Live editor visualization ---
+    private void StopPoison()
+    {
+        if (poisonEffect != null && poisonEffect.isPlaying)
+            poisonEffect.Stop();
+    }
+
     private void UpdateConeVisualsInEditor()
     {
-        if (flameEffect != null)
+        if (poisonEffect != null)
         {
-            var shape = flameEffect.shape;
+            var shape = poisonEffect.shape;
             shape.angle = coneAngle - 10;
             shape.radius = coneLength * 0.1f;
         }

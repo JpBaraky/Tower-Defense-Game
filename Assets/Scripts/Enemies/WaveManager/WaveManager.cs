@@ -11,8 +11,8 @@ public class WaveManager : MonoBehaviour
     public List<Wave> waves = new List<Wave>();
     public float timeBetweenWaves = 5f;
 
-    private int currentWaveIndex = 0;
-    private bool waveInProgress = false;
+    public int currentWaveIndex = 0;
+    public bool waveInProgress = false;
 
     void Start()
     {

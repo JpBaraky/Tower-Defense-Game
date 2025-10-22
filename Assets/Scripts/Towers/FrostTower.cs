@@ -4,44 +4,47 @@ using UnityEngine;
 
 [ExecuteAlways]
 [RequireComponent(typeof(TowerTargeting))]
-public class FlamethrowerTower : MonoBehaviour
+public class FrostTower : MonoBehaviour
 {
     [Header("Cone Settings")]
-    [Range(20, 90)] public float coneAngle = 45f;
+    [Range(90, 360)] public float coneAngle = 360f;
     [Min(0f)] public float coneLength = 8f;
+    private WaveManager waveManager;
 
     [Header("Damage Settings")]
-    public float towerDamage = 20f;
-    public bool applyBurn = true;
-    public float burnDamage = 5f;
-    public float burnDuration = 2f;
-    public float damageInterval = 0.1f;
-
-
+    public float towerDamage = 10f;
+    public bool applySlow = true;
+    [Tooltip("Percent speed reduction (e.g. 10 = 10% slower)")]
+    [Range(0, 90)] public float slowPercent = 30f;
+    [Min(0f)] public float slowDuration = 2f;
+    [Min(0.01f)] public float damageInterval = 0.1f;
 
     [Header("Visuals")]
-    public ParticleSystem flameEffect;
-    public GameObject burnEffectPrefab;
+    public ParticleSystem frostEffect;
+    public Color slowColor = new Color(0.1f, 0.3f, 1f); // dark blue tint
 
     private TowerTargeting targeting;
     private float damageTimer;
 
-    private class BurnInfo
+    private class SlowInfo
     {
         public float timeLeft;
-        public GameObject fireVFX;
+        public float originalSpeed;
+        public Renderer renderer;
+        public Color originalColor;
     }
 
-    private readonly Dictionary<Enemy, BurnInfo> burningEnemies = new();
+    private readonly Dictionary<Enemy, SlowInfo> slowedEnemies = new();
 
     private void Awake()
     {
         targeting = GetComponent<TowerTargeting>();
+        waveManager = FindFirstObjectByType<WaveManager>();
     }
 
     private void Update()
     {
-        // Skip gameplay logic while in Editor and not playing
+        // Skip logic in editor mode
         if (!Application.isPlaying)
         {
             UpdateConeVisualsInEditor();
@@ -50,30 +53,29 @@ public class FlamethrowerTower : MonoBehaviour
 
         Enemy target = targeting.currentTarget;
 
-        if (target == null)
+        if (waveManager.waveInProgress == false )
         {
-            StopFlame();
+            StopFrost();
             return;
         }
 
-        if (flameEffect != null && !flameEffect.isPlaying)
-            flameEffect.Play();
+        if (frostEffect != null && !frostEffect.isPlaying)
+            frostEffect.Play();
 
         damageTimer += Time.deltaTime;
         if (damageTimer >= damageInterval)
         {
-            ApplyConeDamage();
+            ApplyConeEffect();
             damageTimer = 0f;
         }
 
-        UpdateBurningEnemies();
+        UpdateSlowedEnemies();
     }
 
-    private void ApplyConeDamage()
+    private void ApplyConeEffect()
     {
         Vector3 forward = transform.forward;
         Vector3 origin = transform.position;
-
         Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
 
         foreach (Enemy e in enemies)
@@ -88,77 +90,87 @@ public class FlamethrowerTower : MonoBehaviour
             float angle = Vector3.Angle(forward, dir);
             if (angle > coneAngle / 2f) continue;
 
+            // Base tower damage
             e.TakeDamage(towerDamage * damageInterval);
 
-            if (applyBurn)
+            if (applySlow)
             {
-                if (burningEnemies.TryGetValue(e, out var info))
+                if (slowedEnemies.TryGetValue(e, out var info))
                 {
-                    info.timeLeft = burnDuration;
+                    info.timeLeft = slowDuration;
                 }
                 else
                 {
-                    GameObject fx = null;
-                    if (burnEffectPrefab)
-                    {
-                        fx = Instantiate(burnEffectPrefab, e.transform);
-                       // fx.transform.localPosition = Vector3.up * 1f;
-                    }
+                    Renderer r = e.GetComponentInChildren<Renderer>();
+                    float originalSpeed = e.moveSpeed; // requires Enemy to have moveSpeed public
+                    Color originalColor = r != null ? r.material.color : Color.white;
 
-                    burningEnemies[e] = new BurnInfo
+                    // Apply visual + speed slow
+                    e.moveSpeed *= (1f - slowPercent / 100f);
+                    if (r != null)
+                        r.material.color = slowColor;
+
+                    slowedEnemies[e] = new SlowInfo
                     {
-                        timeLeft = burnDuration,
-                        fireVFX = fx
+                        timeLeft = slowDuration,
+                        originalSpeed = originalSpeed,
+                        renderer = r,
+                        originalColor = originalColor
                     };
                 }
             }
         }
     }
 
-    private void UpdateBurningEnemies()
+    private void UpdateSlowedEnemies()
     {
-        if (burningEnemies.Count == 0) return;
+        if (slowedEnemies.Count == 0) return;
 
         List<Enemy> toRemove = new();
 
-        foreach (var kvp in burningEnemies)
+        foreach (var kvp in slowedEnemies)
         {
             Enemy e = kvp.Key;
-            BurnInfo info = kvp.Value;
+            SlowInfo info = kvp.Value;
 
             if (e == null || !e.isActiveAndEnabled)
             {
-                if (info.fireVFX) Destroy(info.fireVFX);
+                RestoreEnemyState(e, info);
                 toRemove.Add(e);
                 continue;
             }
 
-            e.TakeDamage(burnDamage * Time.deltaTime);
             info.timeLeft -= Time.deltaTime;
-
             if (info.timeLeft <= 0)
             {
-                if (info.fireVFX) Destroy(info.fireVFX);
+                RestoreEnemyState(e, info);
                 toRemove.Add(e);
             }
         }
 
         foreach (var e in toRemove)
-            burningEnemies.Remove(e);
+            slowedEnemies.Remove(e);
     }
 
-    private void StopFlame()
+    private void RestoreEnemyState(Enemy e, SlowInfo info)
     {
-        if (flameEffect != null && flameEffect.isPlaying)
-            flameEffect.Stop();
+        if (e == null) return;
+        e.moveSpeed = info.originalSpeed;
+        if (info.renderer != null)
+            info.renderer.material.color = info.originalColor;
     }
 
-    // --- Live editor visualization ---
+    private void StopFrost()
+    {
+        if (frostEffect != null && frostEffect.isPlaying)
+            frostEffect.Stop();
+    }
+
     private void UpdateConeVisualsInEditor()
     {
-        if (flameEffect != null)
+        if (frostEffect != null)
         {
-            var shape = flameEffect.shape;
+            var shape = frostEffect.shape;
             shape.angle = coneAngle - 10;
             shape.radius = coneLength * 0.1f;
         }
@@ -167,7 +179,7 @@ public class FlamethrowerTower : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        Gizmos.color = Application.isPlaying ? Color.red : Color.yellow;
+        Gizmos.color = Application.isPlaying ? Color.cyan : Color.blue;
         Vector3 forward = transform.forward;
 
         Quaternion leftRayRot = Quaternion.Euler(0, -coneAngle / 2f, 0);

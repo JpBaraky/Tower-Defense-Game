@@ -5,16 +5,19 @@ using UnityEngine;
 
 public class EnemyFollowPath : MonoBehaviour
 {
-    public float speed = 2f;
+    
     public bool useOptimalPath = true;
     private Pathfinding pathfinder;
     private List<TileNode> path;
     private int currentIndex = 0;
     public Transform nextNode;
+    private Enemy enemy;
 
     void Start()
     {
         StartCoroutine(InitAfterNodesExist());
+        enemy = GetComponent<Enemy>();
+        
     }
 
     IEnumerator InitAfterNodesExist()
@@ -60,7 +63,7 @@ public class EnemyFollowPath : MonoBehaviour
 
         Vector3 targetPos = currentNode.transform.position;
         nextNode = currentNode.transform;
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, enemy.moveSpeed * Time.deltaTime);
 
         if (Vector3.Distance(transform.position, targetPos) < 0.05f)
             currentIndex++;

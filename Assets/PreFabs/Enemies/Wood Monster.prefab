@@ -46,7 +46,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab82880478ab57f40ba5404f5470b242, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyFollowPath
-  speed: 1
   useOptimalPath: 0
   nextNode: {fileID: 0}
 --- !u!114 &-8461716138496484042
@@ -61,10 +60,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b20b609b53f0a44b588aacde6dc9cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  maxHealth: 500
+  maxHealth: 100
   currentHealth: 100
   moveSpeed: 0.5
   rewardGold: 5
+  floatingTextPrefab: {fileID: 2387702292447526891, guid: 3e433432b8fb3534b89eac9a116acdf3, type: 3}
   pathProgress: 0
 --- !u!1 &2518714384462551039
 GameObject:
