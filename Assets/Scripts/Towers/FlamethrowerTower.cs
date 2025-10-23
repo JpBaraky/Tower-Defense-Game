@@ -8,34 +8,39 @@ public class FlamethrowerTower : MonoBehaviour
 {
     [Header("Cone Settings")]
     [Range(20, 90)] public float coneAngle = 45f;
-    [Min(0f)] public float coneLength = 8f;
+    [Min(0f)] public float coneLength = 1f;
+    public Transform firePoint;
 
     [Header("Damage Settings")]
     public float towerDamage = 20f;
-    public bool applyBurn = true;
-    public float burnDamage = 5f;
-    public float burnDuration = 2f;
+    public bool applyFire = true;
+    public float FireDamage = 5f;
+    public float FireDuration = 2f;
     public float damageInterval = 0.1f;
-
-
+    public float FireVFXFadeTime = 0.5f; // Duration for VFX to fade
 
     [Header("Visuals")]
-    public ParticleSystem flameEffect;
-    public GameObject burnEffectPrefab;
+    public ParticleSystem FireEffect;
+    public GameObject FireEffectPrefab;
 
     private TowerTargeting targeting;
     private float damageTimer;
+    private Coroutine stopFireCoroutine;
 
-    private class BurnInfo
+
+    private class FireInfo
     {
         public float timeLeft;
-        public GameObject fireVFX;
+        public GameObject FireVFX;
+        public Coroutine fadeCoroutine;
     }
 
-    private readonly Dictionary<Enemy, BurnInfo> burningEnemies = new();
+    private readonly Dictionary<Enemy, FireInfo> FireedEnemies = new();
 
     private void Awake()
     {
+
+       
         targeting = GetComponent<TowerTargeting>();
     }
 
@@ -51,24 +56,41 @@ public class FlamethrowerTower : MonoBehaviour
         Enemy target = targeting.currentTarget;
 
         if (target == null)
+    {
+        // Start delayed stop if not already running
+        if (stopFireCoroutine == null)
+            stopFireCoroutine = StartCoroutine(DelayedStopFire(0.1f));
+    }
+    else
+    {
+        // Cancel delayed stop if target came back
+        if (stopFireCoroutine != null)
         {
-            StopFlame();
-            return;
+            StopCoroutine(stopFireCoroutine);
+            stopFireCoroutine = null;
         }
 
-        if (flameEffect != null && !flameEffect.isPlaying)
-            flameEffect.Play();
+        // Play Fire effect if not already playing
+        if (FireEffect != null && !FireEffect.isPlaying)
+            FireEffect.Play();
 
+        // Apply damage over time
         damageTimer += Time.deltaTime;
         if (damageTimer >= damageInterval)
         {
             ApplyConeDamage();
             damageTimer = 0f;
         }
-
-        UpdateBurningEnemies();
     }
-
+        // Always update Fireed enemies to remove expired VFX
+        UpdateFireedEnemies();
+    }
+    private IEnumerator DelayedStopFire(float delay)
+{
+    yield return new WaitForSeconds(delay);
+    StopFire();
+    stopFireCoroutine = null;
+}
     private void ApplyConeDamage()
     {
         Vector3 forward = transform.forward;
@@ -90,106 +112,182 @@ public class FlamethrowerTower : MonoBehaviour
 
             e.TakeDamage(towerDamage * damageInterval);
 
-            if (applyBurn)
+            if (applyFire)
             {
-                if (burningEnemies.TryGetValue(e, out var info))
+                if (FireedEnemies.TryGetValue(e, out var info))
                 {
-                    info.timeLeft = burnDuration;
+                    info.timeLeft = FireDuration; // Refresh Fire duration
                 }
                 else
                 {
                     GameObject fx = null;
-                    if (burnEffectPrefab)
+                    if (FireEffectPrefab)
                     {
-                        fx = Instantiate(burnEffectPrefab, e.transform);
-                       // fx.transform.localPosition = Vector3.up * 1f;
+                        fx = Instantiate(FireEffectPrefab, e.transform);
+                        fx.transform.localPosition = Vector3.zero;
                     }
 
-                    burningEnemies[e] = new BurnInfo
+                    FireedEnemies[e] = new FireInfo
                     {
-                        timeLeft = burnDuration,
-                        fireVFX = fx
+                        timeLeft = FireDuration,
+                        FireVFX = fx,
+                        fadeCoroutine = null
                     };
                 }
             }
         }
     }
 
-    private void UpdateBurningEnemies()
+    private void UpdateFireedEnemies()
     {
-        if (burningEnemies.Count == 0) return;
+        if (FireedEnemies.Count == 0) return;
 
         List<Enemy> toRemove = new();
 
-        foreach (var kvp in burningEnemies)
+        foreach (var kvp in FireedEnemies)
         {
             Enemy e = kvp.Key;
-            BurnInfo info = kvp.Value;
+            FireInfo info = kvp.Value;
+
+            bool removeEnemy = false;
 
             if (e == null || !e.isActiveAndEnabled)
             {
-                if (info.fireVFX) Destroy(info.fireVFX);
-                toRemove.Add(e);
-                continue;
+                removeEnemy = true;
+            }
+            else
+            {
+                e.TakeDamage(FireDamage * Time.deltaTime);
+                info.timeLeft -= Time.deltaTime;
+
+                if (info.timeLeft <= 0)
+                    removeEnemy = true;
             }
 
-            e.TakeDamage(burnDamage * Time.deltaTime);
-            info.timeLeft -= Time.deltaTime;
-
-            if (info.timeLeft <= 0)
+            if (removeEnemy)
             {
-                if (info.fireVFX) Destroy(info.fireVFX);
+                if (info.FireVFX != null)
+                {
+                    if (info.fadeCoroutine != null)
+                        StopCoroutine(info.fadeCoroutine);
+
+                    info.fadeCoroutine = StartCoroutine(FadeAndDestroy(info.FireVFX, FireVFXFadeTime));
+                    info.FireVFX = null;
+                }
+
                 toRemove.Add(e);
             }
         }
 
         foreach (var e in toRemove)
-            burningEnemies.Remove(e);
+            FireedEnemies.Remove(e);
+
+        if (FireedEnemies.Count == 0 && FireEffect != null && FireEffect.isPlaying)
+            FireEffect.Stop();
     }
 
-    private void StopFlame()
+    private IEnumerator FadeAndDestroy(GameObject vfx, float duration)
     {
-        if (flameEffect != null && flameEffect.isPlaying)
-            flameEffect.Stop();
+        if (vfx == null) yield break;
+
+        ParticleSystem ps = vfx.GetComponent<ParticleSystem>();
+        float elapsed = 0f;
+
+        if (ps != null)
+        {
+            var main = ps.main;
+            float startRate = main.startLifetime.constant;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        Destroy(vfx);
     }
 
-    // --- Live editor visualization ---
+    private void StopFire()
+    {
+        if (FireEffect != null && FireEffect.isPlaying)
+            FireEffect.Stop();
+    }
+
     private void UpdateConeVisualsInEditor()
     {
-        if (flameEffect != null)
+        if (FireEffect != null)
         {
-            var shape = flameEffect.shape;
-            shape.angle = coneAngle - 10;
-            shape.radius = coneLength * 0.1f;
+            var shape = FireEffect.shape;
+            shape.angle = coneAngle / 2;
+            
+             var main = FireEffect.main; 
+
+float startLifetime = Mathf.Sqrt(coneLength);              // grows slower than linear
+float startSpeed = (coneLength * 10f) / startLifetime;   
+
+
+// Apply to particle system
+main.startSpeed = startSpeed;
+main.startLifetime = startLifetime;
+
+//adjust emission to maintain density
+var emission = FireEffect.emission;
+emission.rateOverTime = coneLength * 25f;
         }
+    }
+    public void SetConeLength(float length)
+    {
+        coneLength = length;
+       
+        UpdateConeVisualsInEditor();
     }
 
 #if UNITY_EDITOR
-    private void OnDrawGizmos()
+public Transform towerHead; // assign this in inspector
+
+private void OnDrawGizmos()
+{
+    if (towerHead == null) return;
+
+    SetConeLength(targeting != null ? targeting.range : coneLength);
+    Gizmos.color = Application.isPlaying ? Color.red : Color.yellow;
+
+    Vector3 forward = towerHead.forward; // use tower head rotation
+    Vector3 startPos = firePoint.position;
+    startPos.y = 0f;
+
+    // Compute cone edge directions
+    Quaternion leftRayRot = Quaternion.Euler(0, -coneAngle / 2f, 0);
+    Quaternion rightRayRot = Quaternion.Euler(0, coneAngle / 2f, 0);
+
+    Vector3 leftDir = leftRayRot * forward;
+    Vector3 rightDir = rightRayRot * forward;
+
+    Vector3 leftEnd = startPos + leftDir * coneLength;
+    Vector3 rightEnd = startPos + rightDir * coneLength;
+    leftEnd.y = 0f;
+    rightEnd.y = 0f;
+
+    // Draw cone edges
+    Gizmos.DrawLine(startPos, leftEnd);
+    Gizmos.DrawLine(startPos, rightEnd);
+
+    // Draw full circle at coneLength distance
+    int circleSegments = 60;
+    Vector3 prevPoint = startPos + (towerHead.forward * coneLength);
+    prevPoint.y = 0f;
+
+    for (int i = 1; i <= circleSegments; i++)
     {
-        Gizmos.color = Application.isPlaying ? Color.red : Color.yellow;
-        Vector3 forward = transform.forward;
+        float angle = (360f / circleSegments) * i;
+        Quaternion rot = Quaternion.Euler(0, angle, 0);
+        Vector3 nextPoint = startPos + (rot * towerHead.forward) * coneLength;
+        nextPoint.y = 0f;
 
-        Quaternion leftRayRot = Quaternion.Euler(0, -coneAngle / 2f, 0);
-        Quaternion rightRayRot = Quaternion.Euler(0, coneAngle / 2f, 0);
-
-        Vector3 leftDir = leftRayRot * forward;
-        Vector3 rightDir = rightRayRot * forward;
-
-        Gizmos.DrawLine(transform.position, transform.position + leftDir * coneLength);
-        Gizmos.DrawLine(transform.position, transform.position + rightDir * coneLength);
-
-        int segments = 20;
-        Vector3 prevPoint = transform.position + leftDir * coneLength;
-        for (int i = 1; i <= segments; i++)
-        {
-            float lerp = i / (float)segments;
-            Quaternion rot = Quaternion.Euler(0, -coneAngle / 2f + lerp * coneAngle, 0);
-            Vector3 dir = rot * forward;
-            Vector3 nextPoint = transform.position + dir * coneLength;
-            Gizmos.DrawLine(prevPoint, nextPoint);
-            prevPoint = nextPoint;
-        }
+        Gizmos.DrawLine(prevPoint, nextPoint);
+        prevPoint = nextPoint;
     }
+}
 #endif
 }

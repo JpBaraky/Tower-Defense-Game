@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(SphereCollider))]
@@ -20,6 +19,10 @@ public class TowerTargeting : MonoBehaviour
     private List<Enemy> enemiesInRange = new List<Enemy>();
     public Enemy currentTarget;
 
+    // Flag to indicate the enemy list has changed
+    private bool enemiesChanged = false;
+    public bool isPreview;
+
     void Awake()
     {
         detectionCollider = GetComponent<SphereCollider>();
@@ -29,21 +32,19 @@ public class TowerTargeting : MonoBehaviour
 
     void Update()
     {
+        if (isPreview)
+            return;
         CleanEnemyList();
 
-        if (currentTarget == null)
-            currentTarget = SelectTarget();
-
-        if (currentTarget != null)
+        // Only recalculate target if the list changed or current target is invalid
+        if (currentTarget == null || !enemiesInRange.Contains(currentTarget) || enemiesChanged)
         {
-            if (rotateTowardsTarget)
-                RotateTowards(currentTarget.transform);
-
-            // Optional: check if target left range or died
-            float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
-            if (dist > range || !currentTarget.isActiveAndEnabled)
-                currentTarget = null;
+            currentTarget = SelectTarget();
+            enemiesChanged = false;
         }
+
+        if (currentTarget != null && rotateTowardsTarget)
+            RotateTowards(currentTarget.transform);
     }
 
     private void RotateTowards(Transform target)
@@ -62,39 +63,109 @@ public class TowerTargeting : MonoBehaviour
         if (enemiesInRange.Count == 0)
             return null;
 
+        Enemy selected = null;
+
         switch (targetMode)
         {
             case TargetMode.Closest:
-                return enemiesInRange.OrderBy(e => Vector3.Distance(transform.position, e.transform.position)).FirstOrDefault();
+                float minDist = float.MaxValue;
+                foreach (var e in enemiesInRange)
+                {
+                    if (e == null || !e.isActiveAndEnabled) continue;
+                    float dist = Vector3.Distance(transform.position, e.transform.position);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        selected = e;
+                    }
+                }
+                break;
 
             case TargetMode.Weakest:
-                return enemiesInRange.OrderBy(e => e.currentHealth).FirstOrDefault();
+                float minHealth = float.MaxValue;
+                foreach (var e in enemiesInRange)
+                {
+                    if (e == null || !e.isActiveAndEnabled) continue;
+                    if (e.currentHealth < minHealth)
+                    {
+                        minHealth = e.currentHealth;
+                        selected = e;
+                    }
+                }
+                break;
 
             case TargetMode.Strongest:
-                return enemiesInRange.OrderByDescending(e => e.currentHealth).FirstOrDefault();
+                float maxHealth = float.MinValue;
+                foreach (var e in enemiesInRange)
+                {
+                    if (e == null || !e.isActiveAndEnabled) continue;
+                    if (e.currentHealth > maxHealth)
+                    {
+                        maxHealth = e.currentHealth;
+                        selected = e;
+                    }
+                }
+                break;
 
             case TargetMode.Random:
-                return enemiesInRange[Random.Range(0, enemiesInRange.Count)];
+                int attempts = 0;
+                while (attempts < enemiesInRange.Count)
+                {
+                    var candidate = enemiesInRange[Random.Range(0, enemiesInRange.Count)];
+                    if (candidate != null && candidate.isActiveAndEnabled)
+                    {
+                        selected = candidate;
+                        break;
+                    }
+                    attempts++;
+                }
+                break;
 
             case TargetMode.First:
             default:
-                // "First" = the one that entered the range first
-                return enemiesInRange[0];
+                foreach (var e in enemiesInRange)
+                {
+                    if (e != null && e.isActiveAndEnabled)
+                    {
+                        selected = e;
+                        break;
+                    }
+                }
+                break;
         }
+
+        return selected;
     }
 
     private void CleanEnemyList()
     {
-        enemiesInRange.RemoveAll(e => e == null || !e.isActiveAndEnabled);
+        bool removed = false;
+
+        for (int i = enemiesInRange.Count - 1; i >= 0; i--)
+        {
+            if (enemiesInRange[i] == null || !enemiesInRange[i].isActiveAndEnabled)
+            {
+                enemiesInRange.RemoveAt(i);
+                removed = true;
+            }
+        }
+
+        if (removed || (currentTarget != null && !enemiesInRange.Contains(currentTarget)))
+            enemiesChanged = true;
+
+        if (currentTarget != null && !enemiesInRange.Contains(currentTarget))
+            currentTarget = null;
     }
 
     void OnTriggerEnter(Collider other)
     {
-        
         Enemy e = other.GetComponentInParent<Enemy>();
         if (e != null && !enemiesInRange.Contains(e))
+        {
             enemiesInRange.Add(e);
-             Debug.Log($"Enemy entered: {e.name}");
+            enemiesChanged = true;
+            Debug.Log($"Enemy entered: {e.name}");
+        }
     }
 
     void OnTriggerExit(Collider other)
@@ -103,29 +174,10 @@ public class TowerTargeting : MonoBehaviour
         if (e != null)
         {
             enemiesInRange.Remove(e);
+            enemiesChanged = true;
             if (e == currentTarget)
                 currentTarget = null;
-                Debug.Log($"Enemy exited: {e.name}");
+            Debug.Log($"Enemy exited: {e.name}");
         }
     }
-
-
-#if UNITY_EDITOR
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-
-        int segments = 64; // more segments = smoother circle
-        float angleStep = 360f / segments;
-        Vector3 prevPoint = transform.position + new Vector3(range, 0, 0);
-
-        for (int i = 1; i <= segments; i++)
-        {
-            float angle = angleStep * i * Mathf.Deg2Rad;
-            Vector3 nextPoint = transform.position + new Vector3(Mathf.Cos(angle) * range, 0, Mathf.Sin(angle) * range);
-            Gizmos.DrawLine(prevPoint, nextPoint);
-            prevPoint = nextPoint;
-        }
-    }
-#endif
 }

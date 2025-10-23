@@ -79,12 +79,13 @@ public class TowerPlacement : MonoBehaviour
         // Update preview color
         if (previewTower != null)
         {
+            
             previewTower.transform.position = cellCenter;
 
             if (previewRenderers != null)
             {
                 float pulse = (Mathf.Sin(Time.time * pulseSpeed) * 0.5f + 0.5f) * pulseStrength;
-
+              
                 Color baseColor;
                 if (occupied)
                     baseColor = invalidColor;
@@ -156,28 +157,41 @@ public class TowerPlacement : MonoBehaviour
         canPlaceTower = true;
     }
 
-    public void UpdatePreview()
+public void UpdatePreview()
+{
+    // Remove any existing preview objects
+    foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Preview"))
+        Destroy(obj);
+
+    // Instantiate new preview tower
+    previewTower = Instantiate(towerPrefab);
+    previewTower.name = "PreviewTower";
+    previewTower.tag = "Preview";
+
+    // Disable root collider if it exists
+    Collider col = previewTower.GetComponent<Collider>();
+    if (col != null) col.enabled = false;
+
+    // Disable all renderers and create unique materials
+    previewRenderers = previewTower.GetComponentsInChildren<Renderer>();
+    foreach (var rend in previewRenderers)
     {
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Preview"))
-            Destroy(obj);
-
-        previewTower = Instantiate(towerPrefab);
-        previewTower.name = "PreviewTower";
-        previewTower.tag = "Preview";
-
-        Collider col = previewTower.GetComponent<Collider>();
-        if (col != null) col.enabled = false;
-
-        previewRenderers = previewTower.GetComponentsInChildren<Renderer>();
-        foreach (var rend in previewRenderers)
-        {
-            if (rend == null) continue;
-            rend.material = new Material(rend.material);
-            rend.enabled = false;
-        }
-
-        previewTower.transform.localScale += new Vector3(0.01f, 0.01f, 0.01f);
+        if (rend == null) continue;
+        rend.material = new Material(rend.material);
+        rend.enabled = false;
     }
+
+    // Slightly scale up for preview effect
+    previewTower.transform.localScale += new Vector3(0.01f, 0.01f, 0.01f);
+
+    // Safely set isPreview on TowerTargeting (root or child)
+    TowerTargeting targeting = previewTower.GetComponent<TowerTargeting>();
+    if (targeting == null)
+        targeting = previewTower.GetComponentInChildren<TowerTargeting>();
+
+    if (targeting != null)
+        targeting.isPreview = true;
+}
 
     void MarkPathOnSmallTiles()
     {
