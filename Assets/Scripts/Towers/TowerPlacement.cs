@@ -10,6 +10,7 @@ public class TowerPlacement : MonoBehaviour
     public Camera mainCamera;
     public Tilemap tilemap;
     public Tilemap pathTilemap;
+    public Tilemap groundTilemap;
     public GameObject towerPrefab;
     public BillboardSprite billboardManager;
 
@@ -29,6 +30,7 @@ public class TowerPlacement : MonoBehaviour
     private Renderer[] previewRenderers;
     private readonly Dictionary<Vector3Int, bool> occupiedTiles = new();
     private bool canPlaceTower;
+    private readonly Dictionary<Vector3Int, bool> isGroundTile = new();
 
     void Start()
     {
@@ -45,6 +47,7 @@ public class TowerPlacement : MonoBehaviour
 
         UpdatePreview();
         MarkPathOnSmallTiles();
+        MarkGround();
     }
 
     void Update()
@@ -75,6 +78,7 @@ public class TowerPlacement : MonoBehaviour
         Vector3 cellCenter = tilemap.GetCellCenterWorld(cell);
 
         bool occupied = occupiedTiles.ContainsKey(cell) && occupiedTiles[cell];
+        bool isGroundTile = this.isGroundTile.ContainsKey(cell) && this.isGroundTile[cell];
 
         // Update preview color
         if (previewTower != null)
@@ -87,7 +91,7 @@ public class TowerPlacement : MonoBehaviour
                 float pulse = (Mathf.Sin(Time.time * pulseSpeed) * 0.5f + 0.5f) * pulseStrength;
               
                 Color baseColor;
-                if (occupied)
+                if (occupied || !isGroundTile)
                     baseColor = invalidColor;
                 else
                 {
@@ -105,7 +109,7 @@ public class TowerPlacement : MonoBehaviour
         }
 
         // Place tower
-        if (Mouse.current.leftButton.wasPressedThisFrame && !occupied)
+        if (Mouse.current.leftButton.wasPressedThisFrame && !occupied && isGroundTile)
         {
             int towerPrice = towerPrefab.GetComponent<TowerPrice>().price;
 
@@ -116,6 +120,7 @@ public class TowerPlacement : MonoBehaviour
 
                 GameObject newTower = Instantiate(towerPrefab, cellCenter, Quaternion.identity);
                 occupiedTiles[cell] = true;
+
 
                 if (billboardManager != null)
                     billboardManager.RegisterSprite(newTower.transform);
@@ -214,6 +219,31 @@ public void UpdatePreview()
                     Vector3 cellCenter = tilemap.GetCellCenterWorld(smallCell);
                     if (Vector3.Distance(cellCenter, worldCenter) <= bigHexSize * 0.95f)
                         occupiedTiles[smallCell] = true;
+                }
+            }
+        }
+    }
+     void MarkGround()
+    {
+        foreach (var bigCell in groundTilemap.cellBounds.allPositionsWithin)
+        {
+            if (groundTilemap.GetTile(bigCell) == null) continue;
+
+            Vector3 worldCenter = groundTilemap.GetCellCenterWorld(bigCell);
+            float bigHexSize = groundTilemap.layoutGrid.cellSize.x * 0.5f;
+            Bounds hexBounds = new Bounds(worldCenter, Vector3.one * bigHexSize * 2f);
+
+            Vector3Int minCell = tilemap.WorldToCell(hexBounds.min);
+            Vector3Int maxCell = tilemap.WorldToCell(hexBounds.max);
+
+            for (int x = minCell.x; x <= maxCell.x; x++)
+            {
+                for (int y = minCell.y; y <= maxCell.y; y++)
+                {
+                    Vector3Int smallCell = new(x, y, 0);
+                    Vector3 cellCenter = tilemap.GetCellCenterWorld(smallCell);
+                    if (Vector3.Distance(cellCenter, worldCenter) <= bigHexSize * 1f)
+                        isGroundTile[smallCell] = true;
                 }
             }
         }

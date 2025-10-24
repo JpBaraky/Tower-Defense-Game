@@ -8,7 +8,7 @@ public class FrostTower : MonoBehaviour
 {
     [Header("Cone Settings")]
     [Range(90, 360)] public float coneAngle = 360f;
-    [Min(0f)] public float coneLength = 8f;
+    [Min(0f)] public float coneLength = 1f;
     private WaveManager waveManager;
 
     [Header("Damage Settings")]
@@ -171,14 +171,33 @@ public class FrostTower : MonoBehaviour
         if (frostEffect != null)
         {
             var shape = frostEffect.shape;
-            shape.angle = coneAngle - 10;
-            shape.radius = coneLength * 0.1f;
+            shape.angle = coneAngle;
+
+
+            var main = frostEffect.main;
+
+            float startLifetime = Mathf.Sqrt(coneLength);              // grows slower than linear
+            float startSpeed = (coneLength * 10f) / startLifetime;
+            // Apply to particle system
+main.startSpeed = startSpeed;
+main.startLifetime = startLifetime;
+
+            //adjust emission to maintain density
+var emission = frostEffect.emission;
+emission.rateOverTime = coneLength * 25f;
         }
+    }
+    public void SetConeLength(float length)
+    {
+        coneLength = length;
+       
+        UpdateConeVisualsInEditor();
     }
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
+        SetConeLength(targeting != null ? targeting.range : coneLength);
         Gizmos.color = Application.isPlaying ? Color.cyan : Color.blue;
         Vector3 forward = transform.forward;
 

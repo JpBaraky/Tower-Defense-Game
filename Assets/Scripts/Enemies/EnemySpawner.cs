@@ -6,6 +6,7 @@ public class EnemySpawner : MonoBehaviour
 {
     public GameObject enemyPrefab;
     public Transform spawnPoint;
+    public GameObject enemies;
 
     private List<GameObject> aliveEnemies = new List<GameObject>();
 
@@ -22,7 +23,7 @@ public class EnemySpawner : MonoBehaviour
                 yield break;
             }
 
-            GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+            GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity, enemies.transform);
             aliveEnemies.Add(enemy);
 
             // Apply scaling from the wave data
