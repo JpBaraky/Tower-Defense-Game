@@ -11,12 +11,12 @@ public class EnemyFollowPath : MonoBehaviour
     private List<TileNode> path;
     private int currentIndex = 0;
     public Transform nextNode;
-    private Enemy enemy;
+   
 
     void Start()
     {
         StartCoroutine(InitAfterNodesExist());
-        enemy = GetComponent<Enemy>();
+      
         
     }
 
@@ -60,10 +60,11 @@ public class EnemyFollowPath : MonoBehaviour
             currentIndex++;
             return;
         }
-
+        float moveSpeed = GetComponent<Enemy>().moveSpeed;
+         Enemy enemy = GetComponent<Enemy>();
         Vector3 targetPos = currentNode.transform.position;
         nextNode = currentNode.transform;
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, enemy.moveSpeed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
 
         if (Vector3.Distance(transform.position, targetPos) < 0.05f)
             currentIndex++;
