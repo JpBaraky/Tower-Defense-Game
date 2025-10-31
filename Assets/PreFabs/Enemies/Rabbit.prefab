@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4893392654497550604}
   - component: {fileID: 1010246996609701717}
-  - component: {fileID: -2521372400247403683}
   - component: {fileID: -8461716138496484042}
+  - component: {fileID: 7145089619994397884}
   m_Layer: 0
-  m_Name: Dog
+  m_Name: Rabbit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,21 +50,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyFollowPath
   useOptimalPath: 0
   nextNode: {fileID: 0}
---- !u!114 &-2521372400247403683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 287413184781287655}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbb9a4e3306f2144f93f13d2db6b7e9f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyStats
-  health: 0
-  speed: 0
-  reward: 0
 --- !u!114 &-8461716138496484042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,6 +68,21 @@ MonoBehaviour:
   rewardGold: 5
   floatingTextPrefab: {fileID: 2387702292447526891, guid: 3e433432b8fb3534b89eac9a116acdf3, type: 3}
   pathProgress: 0
+--- !u!114 &7145089619994397884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287413184781287655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbb9a4e3306f2144f93f13d2db6b7e9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStats
+  health: 0
+  speed: 0
+  reward: 0
 --- !u!1 &3177002884117460235
 GameObject:
   m_ObjectHideFlags: 0

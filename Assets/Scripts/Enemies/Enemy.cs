@@ -8,15 +8,22 @@ public class Enemy : MonoBehaviour
     public float moveSpeed = 0.5f;
     public float rewardGold = 5f;
     public FloatingText floatingTextPrefab;
+    private EnemyStats enemyStats;
     
     [Header("Optional Path Progress")]
     public float pathProgress; // useful for "First" targeting logic later
 
     public bool IsDead => currentHealth <= 0f;
 
-    void Awake()
+    void Start()
     {
-        currentHealth = maxHealth;
+       
+       
+        enemyStats = GetComponent<EnemyStats>();
+        maxHealth = enemyStats.health;
+        moveSpeed = enemyStats.speed;
+        rewardGold = enemyStats.reward;
+         currentHealth = maxHealth;
     }
 
     public void TakeDamage(float amount)
@@ -31,8 +38,8 @@ public class Enemy : MonoBehaviour
         TowerPlacement playerEconomy = FindFirstObjectByType<TowerPlacement>();
         if (playerEconomy != null)
         {
-            int waveIndex = FindFirstObjectByType<WaveManager>()?.currentWaveIndex ?? 0;
-            float waveMultiplier = Mathf.RoundToInt(rewardGold * (1 + 0.15f * waveIndex));
+           
+            float waveMultiplier = Mathf.RoundToInt(rewardGold);
             playerEconomy.AddGold(Mathf.RoundToInt(waveMultiplier));
             
     
