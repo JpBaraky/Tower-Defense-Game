@@ -8,7 +8,7 @@ public class FrostTower : MonoBehaviour
     [Header("Cone Settings")]
     [Range(90, 360)] public float coneAngle = 360f;
     [Min(0f)] public float coneLength = 1f;
-    private WaveManager waveManager;
+    private WaveSpawner waveSpawner;
 
     [Header("Damage Settings")]
     public float towerDamage = 10f;
@@ -38,7 +38,7 @@ public class FrostTower : MonoBehaviour
     private void Awake()
     {
         targeting = GetComponent<TowerTargeting>();
-        waveManager = FindFirstObjectByType<WaveManager>();
+        waveSpawner = FindFirstObjectByType<WaveSpawner>();
     }
 
     private void Update()
@@ -49,7 +49,7 @@ public class FrostTower : MonoBehaviour
             return;
         }
 
-        if (waveManager == null || !waveManager.waveInProgress)
+        if (waveSpawner == null || !waveSpawner.waveInProgress)
         {
             StopFrost();
             ClearAllSlows();
