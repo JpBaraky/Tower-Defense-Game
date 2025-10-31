@@ -29,15 +29,17 @@ public class TowerPlacement : MonoBehaviour
     public GameObject previewTower;
     private Renderer[] previewRenderers;
     private readonly Dictionary<Vector3Int, bool> occupiedTiles = new();
-    private bool canPlaceTower;
     private readonly Dictionary<Vector3Int, bool> isGroundTile = new();
+
+    private bool canPlaceTower;
+    private bool changedPosition = true;
+    private Vector3Int lastCell;
 
     void Start()
     {
         currentGold = startingGold;
-        Debug.Log("Starting Gold: " + currentGold);
-
         if (mainCamera == null) mainCamera = Camera.main;
+
         if (tilemap == null)
         {
             Debug.LogError("Assign a Tilemap to TowerPlacement.");
@@ -53,6 +55,7 @@ public class TowerPlacement : MonoBehaviour
     void Update()
     {
         goldDisplay.text = currentGold.ToString();
+
         if (!canPlaceTower)
         {
             if (previewRenderers != null)
@@ -70,28 +73,60 @@ public class TowerPlacement : MonoBehaviour
 
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = mainCamera.ScreenPointToRay(mousePos);
-        Plane plane = new(Vector3.up, Vector3.zero);
-        if (!plane.Raycast(ray, out float enter)) return;
 
-        Vector3 world = ray.GetPoint(enter);
-        Vector3Int cell = tilemap.WorldToCell(world);
+        // Try a physics hit first (hit a collider under the cursor).
+        // If that fails, fall back to the X/Z from the camera-plane intersection (preserves previous behavior for tiles without colliders).
+        int hitMask = LayerMask.GetMask("Ground", "Default");
+        bool hasMouseHit = Physics.Raycast(ray, out RaycastHit mouseHit, 200f, hitMask, QueryTriggerInteraction.Ignore);
+        Vector3 mouseHitPoint;
+
+        if (hasMouseHit)
+        {
+            mouseHitPoint = mouseHit.point;
+        }
+        else
+        {
+            // fallback to plane intersection to get X/Z coordinates for tile mapping (keeps placement working on tiles without colliders like path tiles)
+            Plane plane = new Plane(Vector3.up, Vector3.zero);
+            if (!plane.Raycast(ray, out float enter))
+                return;
+            mouseHitPoint = ray.GetPoint(enter);
+        }
+
+        // Use the X/Z of the hit (or plane) to map to the tile cell. Zero the Y for the tilemap lookup.
+        Vector3 worldOnPlane = new Vector3(mouseHitPoint.x, 0f, mouseHitPoint.z);
+        Vector3Int cell = tilemap.WorldToCell(worldOnPlane);
         Vector3 cellCenter = tilemap.GetCellCenterWorld(cell);
 
         bool occupied = occupiedTiles.ContainsKey(cell) && occupiedTiles[cell];
-        bool isGroundTile = this.isGroundTile.ContainsKey(cell) && this.isGroundTile[cell];
+        bool isGround = isGroundTile.ContainsKey(cell) && isGroundTile[cell];
 
-        // Update preview color
         if (previewTower != null)
         {
-            
-            previewTower.transform.position = cellCenter;
+            if (cell != lastCell)
+            {
+                changedPosition = true;
+                lastCell = cell;
+            }
+
+            if (changedPosition)
+            {
+                // If we had a physics hit we can start the downward sample from the hit point's Y.
+                // If not, start from a fixed height above tile center so path tiles (no collider) also get a measured top Y.
+                float sampleStartY = hasMouseHit ? (mouseHitPoint.y + 1f) : (cellCenter.y + 20f);
+                float groundY = GetStableGroundHeight(new Vector3(cellCenter.x, sampleStartY, cellCenter.z));
+                previewTower.transform.position = new Vector3(cellCenter.x, groundY, cellCenter.z);
+                changedPosition = false;
+            }
 
             if (previewRenderers != null)
             {
                 float pulse = (Mathf.Sin(Time.time * pulseSpeed) * 0.5f + 0.5f) * pulseStrength;
-              
+
                 Color baseColor;
-                if (occupied || !isGroundTile)
+                // Show preview on path or other tiles, but mark invalid visually;
+                // occupied prevents placement but the preview still appears.
+                if (occupied || !isGround)
                     baseColor = invalidColor;
                 else
                 {
@@ -108,44 +143,42 @@ public class TowerPlacement : MonoBehaviour
             }
         }
 
-        // Place tower
-        if (Mouse.current.leftButton.wasPressedThisFrame && !occupied && isGroundTile)
+        if (Mouse.current.leftButton.wasPressedThisFrame && !occupied && isGround)
         {
             int towerPrice = towerPrefab.GetComponent<TowerPrice>().price;
 
             if (currentGold >= towerPrice)
             {
                 currentGold -= towerPrice;
-                Debug.Log("Bought tower for " + towerPrice + " gold. Remaining: " + currentGold);
+                Debug.Log($"Bought tower for {towerPrice} gold. Remaining: {currentGold}");
 
-                GameObject newTower = Instantiate(towerPrefab, cellCenter, Quaternion.identity);
+                Vector3 towerPos = previewTower != null ? previewTower.transform.position : new Vector3(cellCenter.x, GetStableGroundHeight(cellCenter), cellCenter.z);
+                GameObject newTower = Instantiate(towerPrefab, towerPos, Quaternion.identity);
                 occupiedTiles[cell] = true;
-
 
                 if (billboardManager != null)
                     billboardManager.RegisterSprite(newTower.transform);
             }
             else
             {
-                Debug.Log("Not enough gold to place tower. You have: " + currentGold);
+                Debug.Log("Not enough gold to place tower.");
             }
 
             if (!Keyboard.current.shiftKey.isPressed || Keyboard.current.shiftKey.wasReleasedThisFrame)
                 canPlaceTower = false;
         }
 
-        // Sell tower
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
+            // Use the same raycast approach to find a tower under the cursor for selling.
+            if (Physics.Raycast(ray, out RaycastHit hit, 200f, hitMask, QueryTriggerInteraction.Ignore))
             {
                 TowerPrice tower = hit.collider.GetComponent<TowerPrice>();
                 if (tower != null)
                 {
                     int refund = Mathf.RoundToInt(tower.price * towerSellMultiplier);
                     currentGold += refund;
-                    Debug.Log("Sold tower for " + refund + " gold. Current gold: " + currentGold);
+                    Debug.Log($"Sold tower for {refund} gold. Current gold: {currentGold}");
 
                     Vector3Int towerCell = tilemap.WorldToCell(tower.transform.position);
                     occupiedTiles[towerCell] = false;
@@ -162,41 +195,47 @@ public class TowerPlacement : MonoBehaviour
         canPlaceTower = true;
     }
 
-public void UpdatePreview()
-{
-    // Remove any existing preview objects
-    foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Preview"))
-        Destroy(obj);
-
-    // Instantiate new preview tower
-    previewTower = Instantiate(towerPrefab);
-    previewTower.name = "PreviewTower";
-    previewTower.tag = "Preview";
-
-    // Disable root collider if it exists
-    Collider col = previewTower.GetComponent<Collider>();
-    if (col != null) col.enabled = false;
-
-    // Disable all renderers and create unique materials
-    previewRenderers = previewTower.GetComponentsInChildren<Renderer>();
-    foreach (var rend in previewRenderers)
+    public void UpdatePreview()
     {
-        if (rend == null) continue;
-        rend.material = new Material(rend.material);
-        rend.enabled = false;
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Preview"))
+            Destroy(obj);
+
+        previewTower = Instantiate(towerPrefab);
+        previewTower.name = "PreviewTower";
+        previewTower.tag = "Preview";
+
+        Collider col = previewTower.GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
+        previewRenderers = previewTower.GetComponentsInChildren<Renderer>();
+        foreach (var rend in previewRenderers)
+        {
+            if (rend == null) continue;
+            rend.material = new Material(rend.material);
+            rend.enabled = false;
+        }
+
+        previewTower.transform.localScale += new Vector3(0.01f, 0.01f, 0.01f);
+
+        TowerTargeting targeting = previewTower.GetComponent<TowerTargeting>() ??
+                                   previewTower.GetComponentInChildren<TowerTargeting>();
+        if (targeting != null)
+            targeting.isPreview = true;
     }
 
-    // Slightly scale up for preview effect
-    previewTower.transform.localScale += new Vector3(0.01f, 0.01f, 0.01f);
+    // Casts a short down-ray from above the provided X/Z and returns the top surface Y (so the tower sits on top).
+    // Caller should set fromPosition.y to a value above the expected surface.
+    float GetStableGroundHeight(Vector3 fromPosition)
+    {
+        const float downDistance = 60f;
+        int mask = LayerMask.GetMask("Ground", "Default");
+        Ray down = new Ray(fromPosition, Vector3.down);
 
-    // Safely set isPreview on TowerTargeting (root or child)
-    TowerTargeting targeting = previewTower.GetComponent<TowerTargeting>();
-    if (targeting == null)
-        targeting = previewTower.GetComponentInChildren<TowerTargeting>();
+        if (Physics.Raycast(down, out RaycastHit hit, downDistance, mask, QueryTriggerInteraction.Ignore))
+            return hit.point.y;
 
-    if (targeting != null)
-        targeting.isPreview = true;
-}
+        return 0f;
+    }
 
     void MarkPathOnSmallTiles()
     {
@@ -212,18 +251,17 @@ public void UpdatePreview()
             Vector3Int maxCell = tilemap.WorldToCell(hexBounds.max);
 
             for (int x = minCell.x; x <= maxCell.x; x++)
-            {
                 for (int y = minCell.y; y <= maxCell.y; y++)
                 {
-                    Vector3Int smallCell = new(x, y, 0);
+                    Vector3Int smallCell = new Vector3Int(x, y, 0);
                     Vector3 cellCenter = tilemap.GetCellCenterWorld(smallCell);
                     if (Vector3.Distance(cellCenter, worldCenter) <= bigHexSize * 0.95f)
                         occupiedTiles[smallCell] = true;
                 }
-            }
         }
     }
-     void MarkGround()
+
+    void MarkGround()
     {
         foreach (var bigCell in groundTilemap.cellBounds.allPositionsWithin)
         {
@@ -237,20 +275,19 @@ public void UpdatePreview()
             Vector3Int maxCell = tilemap.WorldToCell(hexBounds.max);
 
             for (int x = minCell.x; x <= maxCell.x; x++)
-            {
                 for (int y = minCell.y; y <= maxCell.y; y++)
                 {
-                    Vector3Int smallCell = new(x, y, 0);
+                    Vector3Int smallCell = new Vector3Int(x, y, 0);
                     Vector3 cellCenter = tilemap.GetCellCenterWorld(smallCell);
                     if (Vector3.Distance(cellCenter, worldCenter) <= bigHexSize * 1f)
                         isGroundTile[smallCell] = true;
                 }
-            }
         }
     }
+
     public void AddGold(int amount)
     {
         currentGold += amount;
-        Debug.Log("Gained " + amount + " gold. Current gold: " + currentGold);
+        Debug.Log($"Gained {amount} gold. Current gold: {currentGold}");
     }
 }
