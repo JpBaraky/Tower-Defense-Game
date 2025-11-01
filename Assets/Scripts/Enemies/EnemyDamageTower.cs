@@ -15,7 +15,7 @@ public class EnemyDamageTower : MonoBehaviour
                 castle.TakeDamage(damageAmount);
             }
 
-            Destroy(this.transform.parent.parent.gameObject); 
+            Destroy(this.transform.parent.gameObject); 
         }
     }
 }
