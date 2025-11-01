@@ -1,9 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor.ProBuilder;
-using UnityEngine.ProBuilder;
-#endif
 
 public class HexSubTileGenerator : MonoBehaviour
 {
@@ -21,17 +17,17 @@ public class HexSubTileGenerator : MonoBehaviour
         AssignHeights();
     }
 
-  void GenerateSmallHexes()
-{
-    smallHexes.Clear();
+    void GenerateSmallHexes()
+    {
+        smallHexes.Clear();
 
-    // Center hex
-    var centerHex = Instantiate(smallHexPrefab, transform.position, Quaternion.Euler(0f, 30f, 0f), transform);
-    centerHex.transform.localScale = Vector3.one * smallHexRadius;
-    smallHexes.Add(new SmallHex(centerHex));
+        // Center hex
+        var centerHex = Instantiate(smallHexPrefab, transform.position, Quaternion.Euler(0f, 0f, 0f), transform);
+        centerHex.transform.localScale = Vector3.one * smallHexRadius;
+        smallHexes.Add(new SmallHex(centerHex));
 
-    // Distance between centers of touching hexes for pointy-top layout
-    float offset = smallHexRadius * 0.866f;
+        // Distance between centers of touching hexes for pointy-top layout
+        float offset = smallHexRadius * 0.866f;
 
         // Generate 6 surrounding hexes
         for (int i = 0; i < 6; i++)
@@ -39,45 +35,34 @@ public class HexSubTileGenerator : MonoBehaviour
             float angleDeg = 60f * i;
             float angleRad = Mathf.Deg2Rad * angleDeg;
 
-            // Compute direction for each surrounding hex
             Vector3 dir = new Vector3(Mathf.Cos(angleRad), 0, Mathf.Sin(angleRad)) * offset;
-
-            // Calculate position
             Vector3 pos = transform.position + dir;
 
-            var hexObj = Instantiate(smallHexPrefab, pos, Quaternion.Euler(0f, 30f, 0f), transform);
+            var hexObj = Instantiate(smallHexPrefab, pos, Quaternion.Euler(0f, 0f, 0f), transform);
             hexObj.transform.localScale = Vector3.one * smallHexRadius;
-
             smallHexes.Add(new SmallHex(hexObj));
         }
-    this.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-}
 
-
+        transform.rotation = Quaternion.identity;
+    }
 
     void AssignHeights()
     {
         foreach (var hex in smallHexes)
-        {
-            
             hex.height = -1f;
-            
-        }
 
-        // Start with the center random height
         float[] possibleHeights = new float[steps];
-        for (int i = 0; i < steps; i++) possibleHeights[i] = i * heightStep;
+        for (int i = 0; i < steps; i++)
+            possibleHeights[i] = i * heightStep;
 
         smallHexes[0].height = possibleHeights[Random.Range(0, possibleHeights.Length)];
 
-        // Assign neighbors respecting the rule
         for (int i = 1; i < smallHexes.Count; i++)
         {
             float baseHeight = smallHexes[0].height;
             float minAllowed = Mathf.Max(0, baseHeight - heightStep);
             float maxAllowed = Mathf.Min((steps - 1) * heightStep, baseHeight + heightStep);
 
-            // pick a value that’s a multiple of heightStep within range
             List<float> allowed = new List<float>();
             foreach (float h in possibleHeights)
                 if (h >= minAllowed && h <= maxAllowed)
@@ -86,22 +71,31 @@ public class HexSubTileGenerator : MonoBehaviour
             smallHexes[i].height = allowed[Random.Range(0, allowed.Count)];
         }
 
-        // Apply to the mesh or probuilder shape
         foreach (var hex in smallHexes)
         {
-var pb = hex.obj.GetComponent<ProBuilderMesh>();
-if (pb != null)
-{
-    Vector3 scale = hex.obj.transform.localScale;
-    scale.y = hex.height + 1f;
-    hex.obj.transform.localScale = scale;
-    pb.ToMesh();
-    pb.Refresh();
-}
+            MeshFilter mf = hex.obj.GetComponent<MeshFilter>();
+            if (mf != null && mf.sharedMesh != null)
             {
-                // fallback for normal mesh
+                Vector3[] verts = mf.sharedMesh.vertices;
+                float targetHeight = hex.height;
+
+                for (int i = 0; i < verts.Length; i++)
+                    verts[i].y *= targetHeight + 1f;
+
+                Mesh newMesh = new Mesh();
+                newMesh.vertices = verts;
+                newMesh.triangles = mf.sharedMesh.triangles;
+                newMesh.normals = mf.sharedMesh.normals;
+                newMesh.uv = mf.sharedMesh.uv;
+                newMesh.RecalculateBounds();
+                newMesh.RecalculateNormals();
+
+                mf.mesh = newMesh;
+            }
+            else
+            {
                 Vector3 s = hex.obj.transform.localScale;
-                s.y = hex.height + 0.051f; // small offset to avoid z-fighting
+                s.y = hex.height + 0.13f;
                 hex.obj.transform.localScale = s;
             }
         }
