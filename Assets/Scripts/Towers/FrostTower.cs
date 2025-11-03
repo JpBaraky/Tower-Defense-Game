@@ -43,7 +43,7 @@ public class FrostTower : MonoBehaviour
 
     private void Update()
     {
-        if (!Application.isPlaying)
+        if (!Application.isPlaying || targeting.isPreview)
         {
             UpdateConeVisualsInEditor();
             return;
@@ -93,14 +93,14 @@ public class FrostTower : MonoBehaviour
             if (angle > coneAngle / 2f) continue;
 
             // Damage tick
-            e.TakeDamage(towerDamage * damageInterval);
+            e.TakeDamage(towerDamage * damageInterval * (1 + targeting.heightStep / 10f));
 
             // Slow logic
             if (!applySlow) continue;
 
             if (slowedEnemies.TryGetValue(e, out var info))
             {
-                info.timeLeft = slowDuration;
+                info.timeLeft = slowDuration * (1 + targeting.heightStep / 10f);
                 info.refreshedThisFrame = true;
             }
             else
@@ -109,13 +109,13 @@ public class FrostTower : MonoBehaviour
                 float originalSpeed = e.moveSpeed;
                 Color originalColor = r != null ? r.material.color : Color.white;
 
-                e.moveSpeed *= (1f - slowPercent / 100f);
+                e.moveSpeed *= (1f - slowPercent * (1 + targeting.heightStep / 10f) / 100f);
                 if (r != null)
                     r.material.color = slowColor;
 
                 slowedEnemies[e] = new SlowInfo
                 {
-                    timeLeft = slowDuration,
+                    timeLeft = slowDuration * (1 + targeting.heightStep / 10f),
                     originalSpeed = originalSpeed,
                     renderer = r,
                     originalColor = originalColor,

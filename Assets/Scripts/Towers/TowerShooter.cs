@@ -57,7 +57,7 @@ public class TowerShooter : MonoBehaviour
         Projectile p = proj.GetComponent<Projectile>();
         if (p != null)
         {
-            p.Initialize(target.transform, damage, projectileSpeed);
+            p.Initialize(target.transform, damage * (1 + targeting.heightStep / 10f), projectileSpeed);
         }
 
         // play sound

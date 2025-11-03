@@ -11,6 +11,7 @@ public class TowerTargeting : MonoBehaviour
     public float range = 10f;
     public bool rotateTowardsTarget = true;
     public float rotationSpeed = 5f;
+    public int heightStep;
 
     [Header("References")]
     public Transform towerHead; // Optional, where rotation happens
@@ -25,10 +26,13 @@ public class TowerTargeting : MonoBehaviour
 
     void Awake()
     {
+         heightStep = (int)((transform.position.y - Mathf.Floor(transform.position.y)) * 10) - 1;
+        range = range * (1 + heightStep / 10f);
         detectionCollider = GetComponent<SphereCollider>();
         detectionCollider.isTrigger = true;
         detectionCollider.radius = range;
     }
+  
 
     void Update()
     {

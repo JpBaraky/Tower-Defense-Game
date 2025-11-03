@@ -192,9 +192,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerTargeting
   targetMode: 0
-  range: 3
+  range: 1
   rotateTowardsTarget: 1
   rotationSpeed: 20
+  heightStep: 0
   towerHead: {fileID: 6427480468918915345}
   currentTarget: {fileID: 0}
   isPreview: 0
@@ -308,7 +309,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlamethrowerTower
   coneAngle: 45
-  coneLength: 3
+  coneLength: 1
   firePoint: {fileID: 6427480468918915345}
   towerDamage: 20
   applyFire: 1
@@ -734,15 +735,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 065198862db795743af330a317f9a040, type: 3}
       propertyPath: InitialModule.startSpeed.scalar
-      value: 17.320509
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 065198862db795743af330a317f9a040, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 75
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 065198862db795743af330a317f9a040, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
-      value: 1.7320508
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8753963399616646095, guid: 065198862db795743af330a317f9a040, type: 3}
       propertyPath: m_LocalPosition.x

@@ -47,7 +47,9 @@ MonoBehaviour:
   smallHexPrefab: {fileID: 6453313823362947251, guid: e389261646556ba459a8445a73a6b6c3, type: 3}
   smallHexRadius: 0.3333
   heightStep: 0.1
-  steps: 4
+  Numbersteps: 4
+  noiseScale: 0.2
+  noiseAmplitude: 0.4
 --- !u!1 &4260103861686090937
 GameObject:
   m_ObjectHideFlags: 0

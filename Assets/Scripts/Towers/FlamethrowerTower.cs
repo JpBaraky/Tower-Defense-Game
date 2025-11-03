@@ -110,13 +110,13 @@ public class FlamethrowerTower : MonoBehaviour
             float angle = Vector3.Angle(forward, dir);
             if (angle > coneAngle / 2f) continue;
 
-            e.TakeDamage(towerDamage * damageInterval);
+            e.TakeDamage(towerDamage * (1 + targeting.heightStep / 10f) * damageInterval);
 
             if (applyFire)
             {
                 if (FireedEnemies.TryGetValue(e, out var info))
                 {
-                    info.timeLeft = FireDuration; // Refresh Fire duration
+                    info.timeLeft = FireDuration * (1 + targeting.heightStep / 10f); // Refresh Fire duration
                 }
                 else
                 {
@@ -129,7 +129,7 @@ public class FlamethrowerTower : MonoBehaviour
 
                     FireedEnemies[e] = new FireInfo
                     {
-                        timeLeft = FireDuration,
+                        timeLeft = FireDuration * (1 + targeting.heightStep / 10f),
                         FireVFX = fx,
                         fadeCoroutine = null
                     };

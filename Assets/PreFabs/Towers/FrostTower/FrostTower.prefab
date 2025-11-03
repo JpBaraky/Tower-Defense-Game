@@ -220,6 +220,7 @@ MonoBehaviour:
   range: 1
   rotateTowardsTarget: 0
   rotationSpeed: 20
+  heightStep: 0
   towerHead: {fileID: 6427480468918915345}
   currentTarget: {fileID: 0}
   isPreview: 0
@@ -333,7 +334,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FrostTower
   coneAngle: 360
-  coneLength: 1
+  coneLength: 0.5
   towerDamage: 10
   applySlow: 1
   slowPercent: 30
@@ -759,15 +760,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 843f6ed19279a3949b119dea6d0bc57f, type: 3}
       propertyPath: InitialModule.startSpeed.scalar
-      value: 10
+      value: 7.071068
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 843f6ed19279a3949b119dea6d0bc57f, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 25
+      value: 12.5
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 843f6ed19279a3949b119dea6d0bc57f, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
-      value: 1
+      value: 0.70710677
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 843f6ed19279a3949b119dea6d0bc57f, type: 3}
       propertyPath: InitialModule.gravityModifier.scalar

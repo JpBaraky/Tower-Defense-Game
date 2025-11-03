@@ -192,9 +192,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerTargeting
   targetMode: 0
-  range: 2
+  range: 0.75
   rotateTowardsTarget: 1
   rotationSpeed: 20
+  heightStep: 0
   towerHead: {fileID: 6427480468918915345}
   currentTarget: {fileID: 0}
   isPreview: 0
@@ -308,7 +309,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PoisonSprayerTower
   coneAngle: 30
-  coneLength: 2
+  coneLength: 0.75
   firePoint: {fileID: 6427480468918915345}
   towerDamage: 10
   applyPoison: 1
@@ -657,7 +658,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 5a47eafd999293642bdacd3ae6f79320, type: 3}
       propertyPath: InitialModule.startSpeed.scalar
-      value: 14.142136
+      value: 8.6602545
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 5a47eafd999293642bdacd3ae6f79320, type: 3}
       propertyPath: SizeBySpeedModule.curve.minScalar
@@ -665,11 +666,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 5a47eafd999293642bdacd3ae6f79320, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 50
+      value: 18.75
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 5a47eafd999293642bdacd3ae6f79320, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
-      value: 1.4142135
+      value: 0.8660254
       objectReference: {fileID: 0}
     - target: {fileID: 2142597621125326012, guid: 5a47eafd999293642bdacd3ae6f79320, type: 3}
       propertyPath: LifetimeByEmitterSpeedModule.enabled

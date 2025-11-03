@@ -58,7 +58,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 3
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &546245698822374914
 MonoBehaviour:
@@ -76,6 +76,7 @@ MonoBehaviour:
   range: 3
   rotateTowardsTarget: 1
   rotationSpeed: 3
+  heightStep: 0
   towerHead: {fileID: 826014129295124261}
   currentTarget: {fileID: 0}
   isPreview: 0

@@ -153,11 +153,9 @@ public class TowerPlacement : MonoBehaviour
                 Debug.Log($"Bought tower for {towerPrice} gold. Remaining: {currentGold}");
 
                 Vector3 towerPos = previewTower != null ? previewTower.transform.position : new Vector3(cellCenter.x, GetStableGroundHeight(cellCenter), cellCenter.z);
-                GameObject newTower = Instantiate(towerPrefab, towerPos, Quaternion.identity);
+                GameObject newTower = Instantiate(towerPrefab, towerPos, Quaternion.identity, transform);
                 occupiedTiles[cell] = true;
 
-                if (billboardManager != null)
-                    billboardManager.RegisterSprite(newTower.transform);
             }
             else
             {

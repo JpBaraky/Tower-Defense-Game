@@ -110,13 +110,13 @@ public class PoisonSprayerTower : MonoBehaviour
             float angle = Vector3.Angle(forward, dir);
             if (angle > coneAngle / 2f) continue;
 
-            e.TakeDamage(towerDamage * damageInterval);
+            e.TakeDamage(towerDamage * (1 + targeting.heightStep / 10f) * damageInterval);
 
             if (applyPoison)
             {
                 if (poisonedEnemies.TryGetValue(e, out var info))
                 {
-                    info.timeLeft = poisonDuration; // Refresh poison duration
+                    info.timeLeft = poisonDuration * (1 + targeting.heightStep / 10f);
                 }
                 else
                 {

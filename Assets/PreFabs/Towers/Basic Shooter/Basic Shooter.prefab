@@ -73,9 +73,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerTargeting
   targetMode: 0
-  range: 3
+  range: 1
   rotateTowardsTarget: 1
   rotationSpeed: 3
+  heightStep: 0
   towerHead: {fileID: 826014129295124261}
   currentTarget: {fileID: 0}
   isPreview: 0

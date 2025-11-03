@@ -71,7 +71,7 @@ public class HexagonalTiles : MonoBehaviour
     {
         if (parentContainer == null)
         {
-            parentContainer = GameObject.Find("SpawnedTileObjects") ?? new GameObject("SpawnedTileObjects");
+            parentContainer = this.transform.gameObject;
             parentContainer.transform.SetParent(targetTilemap.transform, false);
         }
     }
