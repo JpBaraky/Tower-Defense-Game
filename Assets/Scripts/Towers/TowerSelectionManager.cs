@@ -12,6 +12,7 @@ public class TowerSelectionManager : MonoBehaviour
     [Header("Upgrade Settings")]
     public int baseUpgradeCost = 50;
     public float upgradeCostMultiplier = 1.5f;
+    [HideInInspector] public int upgradeCost;
 
     [SerializeField] private int circleSegments = 64;
 
@@ -27,6 +28,10 @@ public class TowerSelectionManager : MonoBehaviour
     public void SelectTower(TowerSelectable tower)
     {
         selectedTower = tower;
+        upgradeCost = Mathf.RoundToInt(baseUpgradeCost * Mathf.Pow(upgradeCostMultiplier, selectedTower.level - 1));
+        Debug.Log($"Selected tower level: {selectedTower.level}");
+
+        ui.upgradeCost = upgradeCost;
         ui.ShowTowerInfo(tower);
         ShowRangeIndicator(tower);
     }
@@ -63,8 +68,9 @@ public class TowerSelectionManager : MonoBehaviour
     {
         if (selectedTower == null || placement == null) return;
 
-        int upgradeCost = Mathf.RoundToInt(baseUpgradeCost * Mathf.Pow(upgradeCostMultiplier, selectedTower.level - 1));
+       // upgradeCost = upgradeCost = Mathf.RoundToInt(baseUpgradeCost * Mathf.Pow(upgradeCostMultiplier, selectedTower.level));
 
+      
         if (placement.currentGold < upgradeCost)
         {
             Debug.Log("Not enough gold to upgrade.");
@@ -72,6 +78,9 @@ public class TowerSelectionManager : MonoBehaviour
         }
 
         placement.currentGold -= upgradeCost;
+          
+        Debug.Log($"Upgraded {selectedTower.towerName} to level {selectedTower.level}. Cost: {upgradeCost}. Remaining gold: {placement.currentGold}");
+
 
         selectedTower.level++;
         selectedTower.damage *= 1.25f;
@@ -79,9 +88,10 @@ public class TowerSelectionManager : MonoBehaviour
         selectedTower.targeting.damage = selectedTower.damage;
         selectedTower.targeting.range = selectedTower.range;
         selectedTower.targeting.level = selectedTower.level;
+        upgradeCost = Mathf.RoundToInt(baseUpgradeCost * Mathf.Pow(upgradeCostMultiplier, selectedTower.level - 1));
+ui.upgradeCost = upgradeCost;
 
-        Debug.Log($"Upgraded {selectedTower.towerName} to level {selectedTower.level}. Cost: {upgradeCost}. Remaining gold: {placement.currentGold}");
-
+        
         ui.ShowTowerInfo(selectedTower);
         ShowRangeIndicator(selectedTower);
     }
@@ -112,5 +122,4 @@ public class TowerSelectionManager : MonoBehaviour
     if (rangeIndicator != null) Destroy(rangeIndicator);
     ui.Hide();
 }
-
 }

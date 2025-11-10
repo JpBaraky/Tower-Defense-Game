@@ -15,7 +15,7 @@ public class TowerPlacement : MonoBehaviour
     public BillboardSprite billboardManager;
 
     [Header("Economy")]
-    public int startingGold = 100;
+    public int startingGold = 100; 
     public TextMeshProUGUI goldDisplay;
     public int currentGold;
     [Range(0f, 1f)] public float towerSellMultiplier = 0.5f;
@@ -150,8 +150,7 @@ public class TowerPlacement : MonoBehaviour
             if (currentGold >= towerPrice)
             {
                 currentGold -= towerPrice;
-                Debug.Log($"Bought tower for {towerPrice} gold. Remaining: {currentGold}");
-
+              
                 Vector3 towerPos = previewTower != null ? previewTower.transform.position : new Vector3(cellCenter.x, GetStableGroundHeight(cellCenter), cellCenter.z);
                 GameObject newTower = Instantiate(towerPrefab, towerPos, Quaternion.identity, transform);
                 occupiedTiles[cell] = true;
@@ -286,7 +285,6 @@ public class TowerPlacement : MonoBehaviour
     public void AddGold(int amount)
     {
         currentGold += amount;
-        Debug.Log($"Gained {amount} gold. Current gold: {currentGold}");
     }
     // Call from other scripts to free the tile a tower was occupying
 public void FreeCellAtPosition(Vector3 worldPosition)

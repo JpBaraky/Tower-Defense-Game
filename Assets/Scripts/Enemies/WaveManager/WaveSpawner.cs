@@ -43,7 +43,7 @@ public class WaveSpawner : MonoBehaviour
 
         isSpawning = true;
         WaveConfig wave = waves[currentWaveIndex];
-        Debug.Log($"⚔️ Spawning Wave {currentWaveIndex + 1}");
+     
 
         foreach (var waveEnemy in wave.enemies)
         {
