@@ -7,9 +7,9 @@ public class TowerShooter : MonoBehaviour
     [Header("Projectile Settings")]
     public GameObject projectilePrefab;
     public Transform firePoint;
-    public float fireRate = 1f;
+    private float fireRate = 1f;
     public float projectileSpeed = 15f;
-    public float damage = 10f;
+    private float damage = 10f;
 
     [Header("Audio")]
     public AudioClip shootClip;
@@ -34,6 +34,8 @@ public class TowerShooter : MonoBehaviour
 
     void Update()
     {
+        UpdateStats();
+
         if (targeting == null || targeting.currentTarget == null)
             return;
 
@@ -65,5 +67,10 @@ public class TowerShooter : MonoBehaviour
         {
             audioSource.PlayOneShot(shootClip, shootVolume);
         }
+    }
+    private void UpdateStats()
+    {
+        fireRate = targeting.fireRate;
+        damage = targeting.damage;
     }
 }

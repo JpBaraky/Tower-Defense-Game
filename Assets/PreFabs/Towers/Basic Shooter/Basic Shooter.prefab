@@ -75,6 +75,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerTargeting
   targetMode: 0
   range: 1
+  fireRate: 15
+  damage: 1
+  level: 1
   rotateTowardsTarget: 1
   rotationSpeed: 3
   heightStep: 0
@@ -95,9 +98,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerShooter
   projectilePrefab: {fileID: 5981346103648283331, guid: 3c87eba14e9512d458d23a999fe32e8f, type: 3}
   firePoint: {fileID: 6019936428849369868}
-  fireRate: 5
   projectileSpeed: 5
-  damage: 10
   shootClip: {fileID: 8300000, guid: 996b0373e22da2d48903d28e940592a6, type: 3}
   shootVolume: 0.2
 --- !u!82 &328541792927435924
@@ -223,9 +224,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerSelectable
   towerName: Basic Shotter
-  range: 2
+  range: 1
   level: 1
   damage: 3
+  targeting: {fileID: 0}
 --- !u!1 &2182585456205983067
 GameObject:
   m_ObjectHideFlags: 0

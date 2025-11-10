@@ -17,7 +17,7 @@ public class Pathfinding : MonoBehaviour
     public void RefreshNodes()
     {
         nodes = FindObjectsByType<TileNode>(FindObjectsSortMode.None).Where(n => n != null).ToList();
-        Debug.Log($"Pathfinding: {nodes.Count} nodes found");
+       
     }
 
     TileNode GetClosestNode(Vector3 pos) =>

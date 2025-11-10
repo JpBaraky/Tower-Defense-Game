@@ -288,4 +288,27 @@ public class TowerPlacement : MonoBehaviour
         currentGold += amount;
         Debug.Log($"Gained {amount} gold. Current gold: {currentGold}");
     }
+    // Call from other scripts to free the tile a tower was occupying
+public void FreeCellAtPosition(Vector3 worldPosition)
+{
+    // Map world X/Z to the tile cell used by placement
+    Vector3 worldOnPlane = new Vector3(worldPosition.x, 0f, worldPosition.z);
+    Vector3Int cell = tilemap.WorldToCell(worldOnPlane);
+    FreeCell(cell);
+}
+
+public void FreeCell(Vector3Int cell)
+{
+    if (occupiedTiles.ContainsKey(cell))
+    {
+        occupiedTiles[cell] = false;
+        // If you prefer to remove the entry entirely, use:
+        // occupiedTiles.Remove(cell);
+    }
+    else
+    {
+        // Optional: ensure the dict has a clear entry for this cell
+        // occupiedTiles[cell] = false;
+    }
+}
 }

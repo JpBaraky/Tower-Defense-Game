@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Serialization;
 using UnityEngine;
 
 [RequireComponent(typeof(SphereCollider))]
@@ -8,7 +9,10 @@ public class TowerTargeting : MonoBehaviour
 
     [Header("Settings")]
     public TargetMode targetMode = TargetMode.First;
-    public float range = 10f;
+    public float range = 1f;
+    public float fireRate;
+    public float damage;
+    public float level;
     public bool rotateTowardsTarget = true;
     public float rotationSpeed = 5f;
     public int heightStep;
@@ -38,7 +42,8 @@ public class TowerTargeting : MonoBehaviour
             return;
 
         CleanEnemyList();
-
+        if(detectionCollider.radius != range)
+            detectionCollider.radius = range;
         if (currentTarget == null || !enemiesInRange.Contains(currentTarget) || enemiesChanged)
         {
             currentTarget = SelectTarget();
