@@ -17,7 +17,7 @@ public class FlamethrowerTower : MonoBehaviour
     public float FireDamage = 5f;
     public float FireDuration = 2f;
     public float damageInterval = 0.1f;
-    public float FireVFXFadeTime = 0.5f; // Duration for VFX to fade
+    public float FireVFXFadeTime = 0.5f;
 
     [Header("Visuals")]
     public ParticleSystem FireEffect;
@@ -26,7 +26,6 @@ public class FlamethrowerTower : MonoBehaviour
     private TowerTargeting targeting;
     private float damageTimer;
     private Coroutine stopFireCoroutine;
-
 
     private class FireInfo
     {
@@ -39,14 +38,11 @@ public class FlamethrowerTower : MonoBehaviour
 
     private void Awake()
     {
-
-       
         targeting = GetComponent<TowerTargeting>();
     }
 
     private void Update()
     {
-        // Skip gameplay logic while in Editor and not playing
         if (!Application.isPlaying)
         {
             UpdateConeVisualsInEditor();
@@ -56,45 +52,46 @@ public class FlamethrowerTower : MonoBehaviour
         Enemy target = targeting.currentTarget;
 
         if (target == null)
-    {
-        // Start delayed stop if not already running
-        if (stopFireCoroutine == null)
-            stopFireCoroutine = StartCoroutine(DelayedStopFire(0.1f));
-    }
-    else
-    {
-        // Cancel delayed stop if target came back
-        if (stopFireCoroutine != null)
         {
-            StopCoroutine(stopFireCoroutine);
-            stopFireCoroutine = null;
+            if (stopFireCoroutine == null)
+                stopFireCoroutine = StartCoroutine(DelayedStopFire(0.1f));
+        }
+        else
+        {
+            if (stopFireCoroutine != null)
+            {
+                StopCoroutine(stopFireCoroutine);
+                stopFireCoroutine = null;
+            }
+
+            if (FireEffect != null && !FireEffect.isPlaying)
+                FireEffect.Play();
+
+            damageTimer += Time.deltaTime;
+            if (damageTimer >= damageInterval)
+            {
+                ApplyConeDamage();
+                damageTimer = 0f;
+            }
         }
 
-        // Play Fire effect if not already playing
-        if (FireEffect != null && !FireEffect.isPlaying)
-            FireEffect.Play();
-
-        // Apply damage over time
-        damageTimer += Time.deltaTime;
-        if (damageTimer >= damageInterval)
-        {
-            ApplyConeDamage();
-            damageTimer = 0f;
-        }
-    }
-        // Always update Fireed enemies to remove expired VFX
         UpdateFireedEnemies();
     }
+
     private IEnumerator DelayedStopFire(float delay)
-{
-    yield return new WaitForSeconds(delay);
-    StopFire();
-    stopFireCoroutine = null;
-}
+    {
+        yield return new WaitForSeconds(delay);
+        StopFire();
+        stopFireCoroutine = null;
+    }
+
     private void ApplyConeDamage()
     {
-        Vector3 forward = transform.forward;
         Vector3 origin = transform.position;
+        Vector3 forward = transform.forward;
+
+        // Flatten Y for horizontal-only targeting
+        Vector3 flatForward = new Vector3(forward.x, 0f, forward.z).normalized;
 
         Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
 
@@ -104,10 +101,11 @@ public class FlamethrowerTower : MonoBehaviour
                 continue;
 
             Vector3 dir = e.transform.position - origin;
-            float dist = dir.magnitude;
+            Vector3 flatDir = new Vector3(dir.x, 0f, dir.z);
+            float dist = flatDir.magnitude;
             if (dist > coneLength) continue;
 
-            float angle = Vector3.Angle(forward, dir);
+            float angle = Vector3.Angle(flatForward, flatDir);
             if (angle > coneAngle / 2f) continue;
 
             e.TakeDamage(towerDamage * (1 + targeting.heightStep / 10f) * damageInterval);
@@ -116,7 +114,7 @@ public class FlamethrowerTower : MonoBehaviour
             {
                 if (FireedEnemies.TryGetValue(e, out var info))
                 {
-                    info.timeLeft = FireDuration * (1 + targeting.heightStep / 10f); // Refresh Fire duration
+                    info.timeLeft = FireDuration * (1 + targeting.heightStep / 10f);
                 }
                 else
                 {
@@ -148,7 +146,6 @@ public class FlamethrowerTower : MonoBehaviour
         {
             Enemy e = kvp.Key;
             FireInfo info = kvp.Value;
-
             bool removeEnemy = false;
 
             if (e == null || !e.isActiveAndEnabled)
@@ -195,9 +192,6 @@ public class FlamethrowerTower : MonoBehaviour
 
         if (ps != null)
         {
-            var main = ps.main;
-            float startRate = main.startLifetime.constant;
-
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
@@ -220,74 +214,66 @@ public class FlamethrowerTower : MonoBehaviour
         {
             var shape = FireEffect.shape;
             shape.angle = coneAngle / 2;
-            
-             var main = FireEffect.main; 
 
-float startLifetime = Mathf.Sqrt(coneLength);              // grows slower than linear
-float startSpeed = (coneLength * 10f) / startLifetime;   
+            var main = FireEffect.main;
+            float startLifetime = Mathf.Sqrt(coneLength);
+            float startSpeed = (coneLength * 10f) / startLifetime;
 
+            main.startSpeed = startSpeed;
+            main.startLifetime = startLifetime;
 
-// Apply to particle system
-main.startSpeed = startSpeed;
-main.startLifetime = startLifetime;
-
-//adjust emission to maintain density
-var emission = FireEffect.emission;
-emission.rateOverTime = coneLength * 25f;
+            var emission = FireEffect.emission;
+            emission.rateOverTime = coneLength * 25f;
         }
     }
+
     public void SetConeLength(float length)
     {
         coneLength = length;
-       
         UpdateConeVisualsInEditor();
     }
 
 #if UNITY_EDITOR
-public Transform towerHead; // assign this in inspector
+    public Transform towerHead;
 
-private void OnDrawGizmos()
-{
-    if (towerHead == null) return;
-
-    SetConeLength(targeting != null ? targeting.range : coneLength);
-    Gizmos.color = Application.isPlaying ? Color.red : Color.yellow;
-
-    Vector3 forward = towerHead.forward; // use tower head rotation
-    Vector3 startPos = firePoint.position;
-    startPos.y = 0f;
-
-    // Compute cone edge directions
-    Quaternion leftRayRot = Quaternion.Euler(0, -coneAngle / 2f, 0);
-    Quaternion rightRayRot = Quaternion.Euler(0, coneAngle / 2f, 0);
-
-    Vector3 leftDir = leftRayRot * forward;
-    Vector3 rightDir = rightRayRot * forward;
-
-    Vector3 leftEnd = startPos + leftDir * coneLength;
-    Vector3 rightEnd = startPos + rightDir * coneLength;
-    leftEnd.y = 0f;
-    rightEnd.y = 0f;
-
-    // Draw cone edges
-    Gizmos.DrawLine(startPos, leftEnd);
-    Gizmos.DrawLine(startPos, rightEnd);
-
-    // Draw full circle at coneLength distance
-    int circleSegments = 60;
-    Vector3 prevPoint = startPos + (towerHead.forward * coneLength);
-    prevPoint.y = 0f;
-
-    for (int i = 1; i <= circleSegments; i++)
+    private void OnDrawGizmos()
     {
-        float angle = (360f / circleSegments) * i;
-        Quaternion rot = Quaternion.Euler(0, angle, 0);
-        Vector3 nextPoint = startPos + (rot * towerHead.forward) * coneLength;
-        nextPoint.y = 0f;
+        if (towerHead == null) return;
 
-        Gizmos.DrawLine(prevPoint, nextPoint);
-        prevPoint = nextPoint;
+        SetConeLength(targeting != null ? targeting.range : coneLength);
+        Gizmos.color = Application.isPlaying ? Color.red : Color.yellow;
+
+        Vector3 forward = towerHead.forward;
+        Vector3 startPos = firePoint.position;
+
+        Quaternion leftRayRot = Quaternion.Euler(0, -coneAngle / 2f, 0);
+        Quaternion rightRayRot = Quaternion.Euler(0, coneAngle / 2f, 0);
+
+        Vector3 leftDir = leftRayRot * forward;
+        Vector3 rightDir = rightRayRot * forward;
+
+        Vector3 leftEnd = startPos + leftDir * coneLength;
+        Vector3 rightEnd = startPos + rightDir * coneLength;
+        leftEnd.y = startPos.y;
+        rightEnd.y = startPos.y;
+
+        Gizmos.DrawLine(startPos, leftEnd);
+        Gizmos.DrawLine(startPos, rightEnd);
+
+        int circleSegments = 60;
+        Vector3 prevPoint = startPos + (towerHead.forward * coneLength);
+        prevPoint.y = startPos.y;
+
+        for (int i = 1; i <= circleSegments; i++)
+        {
+            float angle = (360f / circleSegments) * i;
+            Quaternion rot = Quaternion.Euler(0, angle, 0);
+            Vector3 nextPoint = startPos + (rot * towerHead.forward) * coneLength;
+            nextPoint.y = startPos.y;
+
+            Gizmos.DrawLine(prevPoint, nextPoint);
+            prevPoint = nextPoint;
+        }
     }
-}
 #endif
 }

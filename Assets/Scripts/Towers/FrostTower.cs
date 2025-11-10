@@ -19,7 +19,7 @@ public class FrostTower : MonoBehaviour
 
     [Header("Visuals")]
     public ParticleSystem frostEffect;
-    public Color slowColor = new Color(0.3f, 0.6f, 1f);
+    public Color slowColor = new(0.3f, 0.6f, 1f);
 
     private TowerTargeting targeting;
     private float damageTimer;
@@ -76,7 +76,7 @@ public class FrostTower : MonoBehaviour
         Vector3 forward = transform.forward;
         Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
 
-        // Mark all slowed enemies as not refreshed this frame
+        // Mark all slowed enemies as unrefreshed
         foreach (var info in slowedEnemies.Values)
             info.refreshedThisFrame = false;
 
@@ -87,16 +87,18 @@ public class FrostTower : MonoBehaviour
 
             Vector3 dir = e.transform.position - origin;
             float dist = dir.magnitude;
-            if (dist > coneLength) continue;
+            if (dist > coneLength)
+                continue;
 
             float angle = Vector3.Angle(forward, dir);
-            if (angle > coneAngle / 2f) continue;
+            if (angle > coneAngle / 2f)
+                continue;
 
-            // Damage tick
+            // Base damage per tick
             e.TakeDamage(towerDamage * damageInterval * (1 + targeting.heightStep / 10f));
 
-            // Slow logic
-            if (!applySlow) continue;
+            if (!applySlow)
+                continue;
 
             if (slowedEnemies.TryGetValue(e, out var info))
             {
@@ -109,7 +111,8 @@ public class FrostTower : MonoBehaviour
                 float originalSpeed = e.moveSpeed;
                 Color originalColor = r != null ? r.material.color : Color.white;
 
-                e.moveSpeed *= (1f - slowPercent * (1 + targeting.heightStep / 10f) / 100f);
+                e.moveSpeed *= Mathf.Clamp01(1f - slowPercent * (1 + targeting.heightStep / 10f) / 100f);
+
                 if (r != null)
                     r.material.color = slowColor;
 
@@ -143,7 +146,6 @@ public class FrostTower : MonoBehaviour
                 continue;
             }
 
-            // Decrease timer only if not refreshed this frame
             if (!info.refreshedThisFrame)
                 info.timeLeft -= Time.deltaTime;
 
@@ -214,10 +216,10 @@ public class FrostTower : MonoBehaviour
         Vector3 startPos = firePoint != null ? firePoint.position : transform.position;
         Vector3 forward = towerHead != null ? towerHead.forward : transform.forward;
 
-        Quaternion leftRayRot = Quaternion.Euler(0, -coneAngle / 2f, 0);
-        Quaternion rightRayRot = Quaternion.Euler(0, coneAngle / 2f, 0);
-        Vector3 leftDir = leftRayRot * forward;
-        Vector3 rightDir = rightRayRot * forward;
+        Quaternion leftRot = Quaternion.Euler(0, -coneAngle / 2f, 0);
+        Quaternion rightRot = Quaternion.Euler(0, coneAngle / 2f, 0);
+        Vector3 leftDir = leftRot * forward;
+        Vector3 rightDir = rightRot * forward;
 
         Gizmos.DrawLine(startPos, startPos + leftDir * coneLength);
         Gizmos.DrawLine(startPos, startPos + rightDir * coneLength);
@@ -234,15 +236,11 @@ public class FrostTower : MonoBehaviour
             prevPoint = nextPoint;
         }
     }
-    void RotateHead(){
-     
- 
-       
-        float rotY = 180 * Time.deltaTime;
 
-        towerHead.Rotate(0, rotY, 0f, Space.Self);
-    } 
-
-    
+    private void RotateHead()
+    {
+        if (towerHead == null) return;
+        towerHead.Rotate(0, 180f * Time.deltaTime, 0f, Space.Self);
+    }
 #endif
 }

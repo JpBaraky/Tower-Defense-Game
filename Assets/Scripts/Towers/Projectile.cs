@@ -3,40 +3,47 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     private Transform target;
+    private Vector3 lastKnownPosition;
     private float speed;
     private float damage;
+    private bool targetLost;
 
     public void Initialize(Transform target, float damage, float speed)
     {
         this.target = target;
         this.damage = damage;
         this.speed = speed;
+        lastKnownPosition = target.position;
+        targetLost = false;
     }
 
     void Update()
     {
-        if (target == null)
+        if (target == null && !targetLost)
+            targetLost = true;
+
+        // Use target position if it's still alive, otherwise keep moving toward the last known position
+        Vector3 destination = targetLost ? lastKnownPosition : target.position;
+        Vector3 dir = destination - transform.position;
+        float distanceThisFrame = speed * Time.deltaTime;
+
+        if (dir.magnitude <= distanceThisFrame)
         {
-            Destroy(gameObject);
+            HitTarget();
             return;
         }
 
-        Vector3 dir = (target.position - transform.position).normalized;
-        transform.position += dir * speed * Time.deltaTime;
+        transform.Translate(dir.normalized * distanceThisFrame, Space.World);
         transform.rotation = Quaternion.LookRotation(dir);
-
-        if (Vector3.Distance(transform.position, target.position) < 0.05f)
-        {
-            HitTarget();
-        }
     }
 
     void HitTarget()
     {
-        Enemy e = target.GetComponent<Enemy>();
-        if (e != null)
+        if (!targetLost)
         {
-            e.TakeDamage(damage);
+            Enemy e = target.GetComponent<Enemy>();
+            if (e != null)
+                e.TakeDamage(damage);
         }
 
         Destroy(gameObject);

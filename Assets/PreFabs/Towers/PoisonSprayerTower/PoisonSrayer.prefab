@@ -196,7 +196,7 @@ MonoBehaviour:
   rotateTowardsTarget: 1
   rotationSpeed: 20
   heightStep: 0
-  towerHead: {fileID: 6427480468918915345}
+  towerHead: {fileID: 2959517748794080392}
   currentTarget: {fileID: 0}
   isPreview: 0
 --- !u!82 &799109205472545997

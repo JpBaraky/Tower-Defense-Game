@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -6996866736346832838}
   - component: {fileID: 328541792927435924}
   - component: {fileID: -435186632708302182}
+  - component: {fileID: 692885342781756394}
   m_Layer: 0
   m_Name: Basic Shooter
   m_TagString: Untagged
@@ -209,6 +210,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerPrice
   price: 50
+--- !u!114 &692885342781756394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 492350520629160744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 347b94673f959fa44af856842523b4c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerSelectable
+  towerName: 
+  range: 0
+  level: 0
+  damage: 0
 --- !u!1 &2182585456205983067
 GameObject:
   m_ObjectHideFlags: 0

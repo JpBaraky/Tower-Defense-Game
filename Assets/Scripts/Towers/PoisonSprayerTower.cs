@@ -17,7 +17,7 @@ public class PoisonSprayerTower : MonoBehaviour
     public float poisonDamage = 5f;
     public float poisonDuration = 2f;
     public float damageInterval = 0.1f;
-    public float poisonVFXFadeTime = 0.5f; // Duration for VFX to fade
+    public float poisonVFXFadeTime = 0.5f;
 
     [Header("Visuals")]
     public ParticleSystem poisonEffect;
@@ -26,7 +26,6 @@ public class PoisonSprayerTower : MonoBehaviour
     private TowerTargeting targeting;
     private float damageTimer;
     private Coroutine stopPoisonCoroutine;
-
 
     private class PoisonInfo
     {
@@ -39,14 +38,11 @@ public class PoisonSprayerTower : MonoBehaviour
 
     private void Awake()
     {
-
-       
         targeting = GetComponent<TowerTargeting>();
     }
 
     private void Update()
     {
-        // Skip gameplay logic while in Editor and not playing
         if (!Application.isPlaying)
         {
             UpdateConeVisualsInEditor();
@@ -56,84 +52,81 @@ public class PoisonSprayerTower : MonoBehaviour
         Enemy target = targeting.currentTarget;
 
         if (target == null)
-    {
-        // Start delayed stop if not already running
-        if (stopPoisonCoroutine == null)
-            stopPoisonCoroutine = StartCoroutine(DelayedStopPoison(0.1f));
-    }
-    else
-    {
-        // Cancel delayed stop if target came back
-        if (stopPoisonCoroutine != null)
         {
-            StopCoroutine(stopPoisonCoroutine);
-            stopPoisonCoroutine = null;
+            if (stopPoisonCoroutine == null)
+                stopPoisonCoroutine = StartCoroutine(DelayedStopPoison(0.15f));
+        }
+        else
+        {
+            if (stopPoisonCoroutine != null)
+            {
+                StopCoroutine(stopPoisonCoroutine);
+                stopPoisonCoroutine = null;
+            }
+
+            if (poisonEffect != null && !poisonEffect.isPlaying)
+                poisonEffect.Play();
+
+            damageTimer += Time.deltaTime;
+            if (damageTimer >= damageInterval)
+            {
+                ApplyConeDamage();
+                damageTimer = 0f;
+            }
         }
 
-        // Play poison effect if not already playing
-        if (poisonEffect != null && !poisonEffect.isPlaying)
-            poisonEffect.Play();
-
-        // Apply damage over time
-        damageTimer += Time.deltaTime;
-        if (damageTimer >= damageInterval)
-        {
-            ApplyConeDamage();
-            damageTimer = 0f;
-        }
-    }
-        // Always update poisoned enemies to remove expired VFX
         UpdatePoisonedEnemies();
     }
+
     private IEnumerator DelayedStopPoison(float delay)
-{
-    yield return new WaitForSeconds(delay);
-    StopPoison();
-    stopPoisonCoroutine = null;
-}
+    {
+        yield return new WaitForSeconds(delay);
+        StopPoison();
+        stopPoisonCoroutine = null;
+    }
+
     private void ApplyConeDamage()
     {
-        Vector3 forward = transform.forward;
-        Vector3 origin = transform.position;
+        if (targeting == null) return;
 
+        Vector3 forward = transform.forward;
+        Vector3 origin = firePoint ? firePoint.position : transform.position;
         Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
 
         foreach (Enemy e in enemies)
         {
-            if (e == null || !e.isActiveAndEnabled)
-                continue;
+            if (e == null || !e.isActiveAndEnabled) continue;
 
             Vector3 dir = e.transform.position - origin;
             float dist = dir.magnitude;
             if (dist > coneLength) continue;
 
             float angle = Vector3.Angle(forward, dir);
-            if (angle > coneAngle / 2f) continue;
+            if (angle > coneAngle * 0.5f) continue;
 
             e.TakeDamage(towerDamage * (1 + targeting.heightStep / 10f) * damageInterval);
 
-            if (applyPoison)
-            {
-                if (poisonedEnemies.TryGetValue(e, out var info))
-                {
-                    info.timeLeft = poisonDuration * (1 + targeting.heightStep / 10f);
-                }
-                else
-                {
-                    GameObject fx = null;
-                    if (poisonEffectPrefab)
-                    {
-                        fx = Instantiate(poisonEffectPrefab, e.transform);
-                        fx.transform.localPosition = Vector3.zero;
-                    }
+            if (!applyPoison) continue;
 
-                    poisonedEnemies[e] = new PoisonInfo
-                    {
-                        timeLeft = poisonDuration,
-                        poisonVFX = fx,
-                        fadeCoroutine = null
-                    };
+            if (poisonedEnemies.TryGetValue(e, out var info))
+            {
+                info.timeLeft = poisonDuration * (1 + targeting.heightStep / 10f);
+            }
+            else
+            {
+                GameObject fx = null;
+                if (poisonEffectPrefab)
+                {
+                    fx = Instantiate(poisonEffectPrefab, e.transform);
+                    fx.transform.localPosition = Vector3.zero;
                 }
+
+                poisonedEnemies[e] = new PoisonInfo
+                {
+                    timeLeft = poisonDuration,
+                    poisonVFX = fx,
+                    fadeCoroutine = null
+                };
             }
         }
     }
@@ -149,11 +142,11 @@ public class PoisonSprayerTower : MonoBehaviour
             Enemy e = kvp.Key;
             PoisonInfo info = kvp.Value;
 
-            bool removeEnemy = false;
+            bool expired = false;
 
             if (e == null || !e.isActiveAndEnabled)
             {
-                removeEnemy = true;
+                expired = true;
             }
             else
             {
@@ -161,10 +154,10 @@ public class PoisonSprayerTower : MonoBehaviour
                 info.timeLeft -= Time.deltaTime;
 
                 if (info.timeLeft <= 0)
-                    removeEnemy = true;
+                    expired = true;
             }
 
-            if (removeEnemy)
+            if (expired)
             {
                 if (info.poisonVFX != null)
                 {
@@ -195,12 +188,14 @@ public class PoisonSprayerTower : MonoBehaviour
 
         if (ps != null)
         {
-            var main = ps.main;
-            float startRate = main.startLifetime.constant;
+            var emission = ps.emission;
+            float startRate = emission.rateOverTime.constant;
 
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                emission.rateOverTime = Mathf.Lerp(startRate, 0f, t);
                 yield return null;
             }
         }
@@ -216,78 +211,64 @@ public class PoisonSprayerTower : MonoBehaviour
 
     private void UpdateConeVisualsInEditor()
     {
-        if (poisonEffect != null)
-        {
-            var shape = poisonEffect.shape;
-            shape.angle = coneAngle / 2;
-            
-             var main = poisonEffect.main; 
+        if (poisonEffect == null) return;
 
-float startLifetime = Mathf.Sqrt(coneLength);              // grows slower than linear
-float startSpeed = (coneLength * 10f) / startLifetime;   
+        var shape = poisonEffect.shape;
+        shape.angle = coneAngle * 0.5f;
 
+        var main = poisonEffect.main;
+        float lifetime = Mathf.Max(0.5f, Mathf.Sqrt(coneLength));
+        float speed = Mathf.Max(0.1f, (coneLength * 10f) / lifetime);
 
-// Apply to particle system
-main.startSpeed = startSpeed;
-main.startLifetime = startLifetime;
+        main.startSpeed = speed;
+        main.startLifetime = lifetime;
 
-//adjust emission to maintain density
-var emission = poisonEffect.emission;
-emission.rateOverTime = coneLength * 25f;
-        }
+        var emission = poisonEffect.emission;
+        emission.rateOverTime = coneLength * 25f;
     }
+
     public void SetConeLength(float length)
     {
-        coneLength = length;
-       
+        coneLength = Mathf.Max(0f, length);
         UpdateConeVisualsInEditor();
     }
 
 #if UNITY_EDITOR
-public Transform towerHead; // assign this in inspector
+    public Transform towerHead;
 
-private void OnDrawGizmos()
-{
-    if (towerHead == null) return;
-
-    SetConeLength(targeting != null ? targeting.range : coneLength);
-    Gizmos.color = Application.isPlaying ? Color.red : Color.yellow;
-
-    Vector3 forward = towerHead.forward; // use tower head rotation
-    Vector3 startPos = firePoint.position;
-    startPos.y = 0f;
-
-    // Compute cone edge directions
-    Quaternion leftRayRot = Quaternion.Euler(0, -coneAngle / 2f, 0);
-    Quaternion rightRayRot = Quaternion.Euler(0, coneAngle / 2f, 0);
-
-    Vector3 leftDir = leftRayRot * forward;
-    Vector3 rightDir = rightRayRot * forward;
-
-    Vector3 leftEnd = startPos + leftDir * coneLength;
-    Vector3 rightEnd = startPos + rightDir * coneLength;
-    leftEnd.y = 0f;
-    rightEnd.y = 0f;
-
-    // Draw cone edges
-    Gizmos.DrawLine(startPos, leftEnd);
-    Gizmos.DrawLine(startPos, rightEnd);
-
-    // Draw full circle at coneLength distance
-    int circleSegments = 60;
-    Vector3 prevPoint = startPos + (towerHead.forward * coneLength);
-    prevPoint.y = 0f;
-
-    for (int i = 1; i <= circleSegments; i++)
+    private void OnDrawGizmos()
     {
-        float angle = (360f / circleSegments) * i;
-        Quaternion rot = Quaternion.Euler(0, angle, 0);
-        Vector3 nextPoint = startPos + (rot * towerHead.forward) * coneLength;
-        nextPoint.y = 0f;
+        if (firePoint == null || (targeting == null && towerHead == null)) return;
 
-        Gizmos.DrawLine(prevPoint, nextPoint);
-        prevPoint = nextPoint;
+        float range = targeting != null ? targeting.range : coneLength;
+        SetConeLength(range);
+
+        Gizmos.color = Application.isPlaying ? Color.green : Color.yellow;
+
+        Vector3 forward = towerHead ? towerHead.forward : transform.forward;
+        Vector3 startPos = firePoint.position;
+        //startPos.y = 0f;
+
+        Quaternion leftRot = Quaternion.Euler(0, -coneAngle / 2f, 0);
+        Quaternion rightRot = Quaternion.Euler(0, coneAngle / 2f, 0);
+
+        Vector3 leftDir = leftRot * forward;
+        Vector3 rightDir = rightRot * forward;
+
+        Gizmos.DrawLine(startPos, startPos + leftDir * range);
+        Gizmos.DrawLine(startPos, startPos + rightDir * range);
+
+        int segs = 60;
+        Vector3 prev = startPos + forward * range;
+
+        for (int i = 1; i <= segs; i++)
+        {
+            float a = (360f / segs) * i;
+            Quaternion rot = Quaternion.Euler(0, a, 0);
+            Vector3 next = startPos + (rot * forward) * range;
+            Gizmos.DrawLine(prev, next);
+            prev = next;
+        }
     }
-}
 #endif
 }
