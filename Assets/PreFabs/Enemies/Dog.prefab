@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 1114429318127390485}
   - component: {fileID: 7591570822620030997}
   m_Layer: 0
-  m_Name: Wood Monster
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

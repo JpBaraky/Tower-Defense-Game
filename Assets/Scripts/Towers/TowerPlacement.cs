@@ -200,6 +200,8 @@ public class TowerPlacement : MonoBehaviour
         previewTower = Instantiate(towerPrefab);
         previewTower.name = "PreviewTower";
         previewTower.tag = "Preview";
+    foreach (Transform t in previewTower.GetComponentsInChildren<Transform>(true))
+    t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 
         Collider col = previewTower.GetComponent<Collider>();
         if (col != null) col.enabled = false;

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class TowerSelectionManager : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class TowerSelectionManager : MonoBehaviour
 
     private TowerSelectable selectedTower;
     private GameObject rangeIndicator;
-    private TowerPlacement placement; // your economy system reference
+    private TowerPlacement placement;
 
     [Header("Upgrade Settings")]
     public int baseUpgradeCost = 50;
@@ -27,11 +28,55 @@ public class TowerSelectionManager : MonoBehaviour
             Debug.LogError("TowerPlacement not found in scene. TowerSelectionManager requires it.");
     }
 
+    void Update()
+    {
+        if (selectedTower == null) return;
+
+        // Deselect if ESC pressed
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            DeselectTower();
+            return;
+        }
+
+        // Handle mouse click
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                // Ignore clicks on UI Tower layer
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("UI Tower"))
+                    return;
+                // Clicked another tower
+                var otherTower = hit.collider.GetComponentInParent<TowerSelectable>();
+                if (otherTower != null)
+                {
+                    if (otherTower != selectedTower)
+                        SelectTower(otherTower);
+                    return;
+                }
+
+                // Ignore clicks on UI Tower layer
+              
+
+                // Anything else deselects
+                DeselectTower();
+            }
+            else
+            {
+                
+                Debug.Log("Clicked empty space");
+                DeselectTower();
+            }
+        }
+    }
+
     public void SelectTower(TowerSelectable tower)
     {
         selectedTower = tower;
         upgradeCost = Mathf.RoundToInt(baseUpgradeCost * Mathf.Pow(upgradeCostMultiplier, selectedTower.level - 1));
-      
+
         ui.upgradeCost = upgradeCost;
         ui.ShowTowerInfo(tower);
         ShowRangeIndicator(tower);
@@ -69,9 +114,6 @@ public class TowerSelectionManager : MonoBehaviour
     {
         if (selectedTower == null || placement == null) return;
 
-
-
-      
         if (placement.currentGold < upgradeCost)
         {
             Debug.Log("Not enough gold to upgrade.");
@@ -79,9 +121,8 @@ public class TowerSelectionManager : MonoBehaviour
         }
 
         placement.currentGold -= upgradeCost;
-          
-        Debug.Log($"Upgraded {selectedTower.towerName} to level {selectedTower.level}. Cost: {upgradeCost}. Remaining gold: {placement.currentGold}");
 
+        Debug.Log($"Upgraded {selectedTower.towerName} to level {selectedTower.level}. Cost: {upgradeCost}. Remaining gold: {placement.currentGold}");
 
         selectedTower.level++;
         selectedTower.damage *= 1.25f;
@@ -89,46 +130,52 @@ public class TowerSelectionManager : MonoBehaviour
         selectedTower.targeting.damage = selectedTower.damage;
         selectedTower.targeting.range = selectedTower.range;
         selectedTower.targeting.level = selectedTower.level;
-        upgradeCost = Mathf.RoundToInt(baseUpgradeCost * Mathf.Pow(upgradeCostMultiplier, selectedTower.level - 1));
-ui.upgradeCost = upgradeCost;
 
-        
+        upgradeCost = Mathf.RoundToInt(baseUpgradeCost * Mathf.Pow(upgradeCostMultiplier, selectedTower.level - 1));
+        ui.upgradeCost = upgradeCost;
+
         ui.ShowTowerInfo(selectedTower);
         ShowRangeIndicator(selectedTower);
     }
 
-   public void SellTower()
-{
-    if (selectedTower == null || placement == null) return;
-    
-    TowerPrice priceComponent = selectedTower.GetComponentInParent<TowerPrice>();
-if (priceComponent == null)
-    priceComponent = selectedTower.GetComponentInChildren<TowerPrice>();
+    public void SellTower()
+    {
+        if (selectedTower == null || placement == null) return;
+
+        TowerPrice priceComponent = selectedTower.GetComponentInParent<TowerPrice>();
         if (priceComponent == null)
-        { 
-            
-           
+            priceComponent = selectedTower.GetComponentInChildren<TowerPrice>();
+
+        if (priceComponent == null)
+        {
             Debug.LogWarning("Tower has no TowerPrice component, cannot calculate refund.");
             return;
         }
-         var effect = Instantiate(coinEffectPrefab, selectedTower.transform.position, Quaternion.identity);
-Destroy(effect, 1.5f); // destroys after 1.5 seconds
-    AudioSource.PlayClipAtPoint(sellSound, Camera.main.transform.position);
 
-    // Refund
-    int refund = Mathf.RoundToInt(priceComponent.price * placement.towerSellMultiplier);
-    placement.currentGold += refund;
+        var effect = Instantiate(coinEffectPrefab, selectedTower.transform.position, Quaternion.identity);
+        Destroy(effect, 1.5f);
+        AudioSource.PlayClipAtPoint(sellSound, Camera.main.transform.position);
 
-    // Free the occupied tile in the placement dictionary
-    placement.FreeCellAtPosition(selectedTower.transform.position);
+        int refund = Mathf.RoundToInt(priceComponent.price * placement.towerSellMultiplier);
+        placement.currentGold += refund;
+
+        placement.FreeCellAtPosition(selectedTower.transform.position);
 
         Debug.Log($"Sold tower for {refund} gold. Current gold: {placement.currentGold}");
-    
 
-    Destroy(selectedTower.gameObject);
-    selectedTower = null;
-  
-    if (rangeIndicator != null) Destroy(rangeIndicator);
-    ui.Hide();
-}
+        Destroy(selectedTower.gameObject);
+        selectedTower = null;
+
+        if (rangeIndicator != null) Destroy(rangeIndicator);
+        ui.Hide();
+    }
+
+    void DeselectTower()
+    {
+        if (rangeIndicator != null)
+            Destroy(rangeIndicator);
+
+        ui.Hide();
+        selectedTower = null;
+    }
 }

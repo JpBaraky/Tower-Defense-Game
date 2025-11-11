@@ -17,7 +17,8 @@ public class TowerClickRaycaster : MonoBehaviour
             Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f, towerLayer))
             {
-                var tower = hit.collider.GetComponent<TowerSelectable>();
+                Debug.Log("Hit: " + hit.collider.name);
+                var tower = hit.collider.GetComponentInParent<TowerSelectable>();
                 if (tower != null)
                     TowerSelectionManager.Instance.SelectTower(tower);
             }
