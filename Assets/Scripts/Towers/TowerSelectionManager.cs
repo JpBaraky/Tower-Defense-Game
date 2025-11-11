@@ -4,6 +4,8 @@ public class TowerSelectionManager : MonoBehaviour
 {
     public static TowerSelectionManager Instance;
     public TowerUI ui;
+    public GameObject coinEffectPrefab;
+    public AudioClip sellSound;
 
     private TowerSelectable selectedTower;
     private GameObject rangeIndicator;
@@ -29,8 +31,7 @@ public class TowerSelectionManager : MonoBehaviour
     {
         selectedTower = tower;
         upgradeCost = Mathf.RoundToInt(baseUpgradeCost * Mathf.Pow(upgradeCostMultiplier, selectedTower.level - 1));
-        Debug.Log($"Selected tower level: {selectedTower.level}");
-
+      
         ui.upgradeCost = upgradeCost;
         ui.ShowTowerInfo(tower);
         ShowRangeIndicator(tower);
@@ -101,11 +102,14 @@ ui.upgradeCost = upgradeCost;
     if (selectedTower == null || placement == null) return;
 
     TowerPrice priceComponent = selectedTower.GetComponent<TowerPrice>();
-    if (priceComponent == null)
-    {
-        Debug.LogWarning("Tower has no TowerPrice component, cannot calculate refund.");
-        return;
-    }
+        if (priceComponent == null)
+        {
+            Debug.LogWarning("Tower has no TowerPrice component, cannot calculate refund.");
+            return;
+        }
+         var effect = Instantiate(coinEffectPrefab, selectedTower.transform.position, Quaternion.identity);
+Destroy(effect, 1.5f); // destroys after 1.5 seconds
+    AudioSource.PlayClipAtPoint(sellSound, Camera.main.transform.position);
 
     // Refund
     int refund = Mathf.RoundToInt(priceComponent.price * placement.towerSellMultiplier);
@@ -118,7 +122,7 @@ ui.upgradeCost = upgradeCost;
 
     Destroy(selectedTower.gameObject);
     selectedTower = null;
-
+  
     if (rangeIndicator != null) Destroy(rangeIndicator);
     ui.Hide();
 }

@@ -14,7 +14,7 @@ public class TowerSelectable : MonoBehaviour
         range = targeting.range;
         damage = targeting.damage;
         level = targeting.level;
-        Debug.Log(level);
+      
     }
 
     void Update()
