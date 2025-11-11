@@ -207,23 +207,4 @@ public class HexagonalTiles : MonoBehaviour
 #endif
 }
 
-// Helper component to track which tilemap a prefab belongs to
-public class SpawnedTileInfo : MonoBehaviour
-{
-    public Tilemap sourceTilemap;
-}
 
-#if UNITY_EDITOR
-public static class TilemapExtensions
-{
-    public static void GetUsedTiles(this Tilemap tilemap, HashSet<Vector3Int> positions)
-    {
-        positions.Clear();
-        foreach (var pos in tilemap.cellBounds.allPositionsWithin)
-        {
-            if (tilemap.HasTile(pos))
-                positions.Add(pos);
-        }
-    }
-}
-#endif
