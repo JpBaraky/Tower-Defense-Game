@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7063783473128802822}
   - component: {fileID: 7011039834772888906}
   - component: {fileID: 507906855639900166}
-  m_Layer: 7
+  m_Layer: 2
   m_Name: AOE Tower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -453,8 +453,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
+  m_Radius: 4
+  m_Height: 5.59
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1001 &2334178375744931746

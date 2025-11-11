@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 328541792927435924}
   - component: {fileID: -435186632708302182}
   - component: {fileID: 692885342781756394}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Basic Shooter
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7907193919962992475}
   - component: {fileID: 1512451438228304651}
   - component: {fileID: 7592526571709069271}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BlueTower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,8 +111,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
+  m_Radius: 4
+  m_Height: 7.13
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &1982363345728832776
@@ -330,7 +330,7 @@ GameObject:
   - component: {fileID: 827398467475931530}
   - component: {fileID: 557712302536540320}
   - component: {fileID: 2369179475893511658}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: FrostTower
   m_TagString: Untagged
   m_Icon: {fileID: 0}

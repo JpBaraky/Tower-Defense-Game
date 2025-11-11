@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7153149179094148449}
   - component: {fileID: 8377272042764011607}
   - component: {fileID: 934005199596785557}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Button (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -130,7 +130,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8650856466244608418}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Buttons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -167,7 +167,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2706651535393156181}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Texts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -208,7 +208,7 @@ GameObject:
   - component: {fileID: 4802742624923957354}
   - component: {fileID: 1940739011799286602}
   - component: {fileID: 4359360984082484026}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -344,8 +344,7 @@ GameObject:
   - component: {fileID: 6461754599311942179}
   - component: {fileID: 7088415670105227719}
   - component: {fileID: 5431548525979710190}
-  - component: {fileID: 5618074056903948694}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: TowerUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -411,24 +410,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5618074056903948694
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1500109514850848533}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7cca3fdce36e704b9dcc8f46181d263, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TowerUI
-  panel: {fileID: 1500109514850848533}
-  nameText: {fileID: 1850845813696331837}
-  levelText: {fileID: 159426560952840406}
-  dmgText: {fileID: 9129108394893398340}
-  rangeText: {fileID: 159426560952840406}
-  upgradeButton: {fileID: 934005199596785557}
 --- !u!1 &2721828615357193323
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,7 +421,7 @@ GameObject:
   - component: {fileID: 272808718824659817}
   - component: {fileID: 1398025429644572219}
   - component: {fileID: 7700739391224970380}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Level
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -455,16 +436,16 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2721828615357193323}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 8.86}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2706651535393156181}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -27.7, y: 42.3}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchorMin: {x: 0, y: 0.74}
+  m_AnchorMax: {x: 0, y: 0.74}
+  m_AnchoredPosition: {x: 50.34, y: 9.439999}
+  m_SizeDelta: {x: 100.1, y: 14.58}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1398025429644572219
 CanvasRenderer:
@@ -559,7 +540,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 84.306305, y: 33.79364, z: 24.900635, w: 0}
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -576,7 +557,7 @@ GameObject:
   - component: {fileID: 5011053243841892451}
   - component: {fileID: 3631450981498431487}
   - component: {fileID: 8673868179759710855}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -712,7 +693,7 @@ GameObject:
   - component: {fileID: 7028419958252635030}
   - component: {fileID: 4905644872987536211}
   - component: {fileID: 9129108394893398340}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Damage Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -727,7 +708,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4366490137550781150}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 6.94}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -735,8 +716,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -30.2, y: 24.8}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: -0.6, y: 17.86}
+  m_SizeDelta: {x: 99.81, y: 22.22}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4905644872987536211
 CanvasRenderer:
@@ -831,7 +812,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 84.306305, y: 33.79364, z: 24.900635, w: 0}
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -849,7 +830,7 @@ GameObject:
   - component: {fileID: 6228948309297852332}
   - component: {fileID: 4600440660888636862}
   - component: {fileID: 8175908924845765332}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -957,7 +938,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4600440660888636862}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 8b9990e99f89de74a80c905134617990, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &7646117438354293314
 GameObject:
   m_ObjectHideFlags: 0
@@ -969,7 +962,7 @@ GameObject:
   - component: {fileID: 2127140694968315899}
   - component: {fileID: 3418964923286264005}
   - component: {fileID: 159426560952840406}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Range
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -984,7 +977,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7646117438354293314}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 8.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -992,8 +985,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -30.2, y: 12.7}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: -0.46, y: 4.15}
+  m_SizeDelta: {x: 98.95, y: 15.78}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3418964923286264005
 CanvasRenderer:
@@ -1088,7 +1081,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 84.306305, y: 33.79364, z: 24.900635, w: 0}
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1105,7 +1098,7 @@ GameObject:
   - component: {fileID: 5341895624571970485}
   - component: {fileID: 4166136746588273640}
   - component: {fileID: 1850845813696331837}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: TowerName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1120,7 +1113,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8577937849565372743}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -17.400515}
+  m_LocalPosition: {x: 0, y: 0, z: -10.36}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1128,8 +1121,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -13.7}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: -0.14, y: -20.74}
+  m_SizeDelta: {x: 100.09, y: 21.82}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4166136746588273640
 CanvasRenderer:
@@ -1224,7 +1217,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 49.400337, y: 10.884675, z: 49.400333, w: 11.953947}
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

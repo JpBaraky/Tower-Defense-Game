@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class TowerSelectionManager : MonoBehaviour
 {
@@ -42,12 +43,13 @@ public class TowerSelectionManager : MonoBehaviour
         // Handle mouse click
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
+            // Ignore clicks over UI
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                // Ignore clicks on UI Tower layer
-                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("UI Tower"))
-                    return;
                 // Clicked another tower
                 var otherTower = hit.collider.GetComponentInParent<TowerSelectable>();
                 if (otherTower != null)
@@ -57,16 +59,12 @@ public class TowerSelectionManager : MonoBehaviour
                     return;
                 }
 
-                // Ignore clicks on UI Tower layer
-              
-
-                // Anything else deselects
+                // Clicked elsewhere — deselect
                 DeselectTower();
             }
             else
             {
-                
-                Debug.Log("Clicked empty space");
+                // Clicked empty space
                 DeselectTower();
             }
         }

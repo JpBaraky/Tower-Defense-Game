@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 328541792927435924}
   - component: {fileID: -435186632708302182}
   - component: {fileID: 7652769934301500478}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: SniperTower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -498,7 +498,7 @@ GameObject:
   - component: {fileID: 6696625799041284043}
   - component: {fileID: 4225057823412444279}
   - component: {fileID: 6538373913856635101}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PurpleTower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -595,8 +595,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
+  m_Radius: 4
+  m_Height: 6
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1001 &1020993896961886011
