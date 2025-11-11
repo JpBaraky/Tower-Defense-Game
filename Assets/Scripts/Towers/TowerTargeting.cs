@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Serialization;
 using UnityEngine;
 
 [RequireComponent(typeof(SphereCollider))]
@@ -8,39 +9,41 @@ public class TowerTargeting : MonoBehaviour
 
     [Header("Settings")]
     public TargetMode targetMode = TargetMode.First;
-    public float range = 10f;
+    public float range = 1f;
+    public float fireRate;
+    public float damage;
+    public float level;
     public bool rotateTowardsTarget = true;
     public float rotationSpeed = 5f;
     public int heightStep;
 
     [Header("References")]
-    public Transform towerHead; // Optional, where rotation happens
+    public Transform towerHead;
     private SphereCollider detectionCollider;
 
     private List<Enemy> enemiesInRange = new List<Enemy>();
     public Enemy currentTarget;
 
-    // Flag to indicate the enemy list has changed
     private bool enemiesChanged = false;
     public bool isPreview;
 
     void Awake()
     {
-         heightStep = (int)((transform.position.y - Mathf.Floor(transform.position.y)) * 10) - 1;
+        heightStep = (int)((transform.position.y - Mathf.Floor(transform.position.y)) * 10) - 1;
         range = range * (1 + heightStep / 10f);
         detectionCollider = GetComponent<SphereCollider>();
         detectionCollider.isTrigger = true;
         detectionCollider.radius = range;
     }
-  
 
     void Update()
     {
         if (isPreview)
             return;
-        CleanEnemyList();
 
-        // Only recalculate target if the list changed or current target is invalid
+        CleanEnemyList();
+        if(detectionCollider.radius != range)
+            detectionCollider.radius = range;
         if (currentTarget == null || !enemiesInRange.Contains(currentTarget) || enemiesChanged)
         {
             currentTarget = SelectTarget();
@@ -48,7 +51,13 @@ public class TowerTargeting : MonoBehaviour
         }
 
         if (currentTarget != null && rotateTowardsTarget)
-            RotateTowards(currentTarget.transform);
+        {
+            Transform aimTarget = currentTarget.transform.childCount > 0
+                ? currentTarget.transform.GetChild(0)
+                : currentTarget.transform;
+
+            RotateTowards(aimTarget);
+        }
     }
 
     private void RotateTowards(Transform target)
@@ -168,7 +177,6 @@ public class TowerTargeting : MonoBehaviour
         {
             enemiesInRange.Add(e);
             enemiesChanged = true;
-            Debug.Log($"Enemy entered: {e.name}");
         }
     }
 
@@ -181,7 +189,6 @@ public class TowerTargeting : MonoBehaviour
             enemiesChanged = true;
             if (e == currentTarget)
                 currentTarget = null;
-            Debug.Log($"Enemy exited: {e.name}");
         }
     }
 }

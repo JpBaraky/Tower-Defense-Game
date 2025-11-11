@@ -26,7 +26,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6738416189740482323}
@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 6738416189740482323}
   - component: {fileID: 40253765669998573}
   - component: {fileID: 7758644919647962227}
+  - component: {fileID: 3842232667685314729}
   m_Layer: 0
   m_Name: Portal
   m_TagString: Untagged
@@ -58,13 +59,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3238314320320579634}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.43185085, y: -0.5599546, z: -0.55975914, w: -0.43200162}
+  m_LocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: -0.5}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 12, y: 12, z: 12}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2661239524629348848}
-  m_LocalEulerAnglesHint: {x: -89.98, y: -975.3, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: -180, z: 0}
 --- !u!33 &40253765669998573
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -121,3 +122,15 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3842232667685314729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3238314320320579634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb14786e67efd0147941715f0b02c5a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoorFaceTileNodeY
