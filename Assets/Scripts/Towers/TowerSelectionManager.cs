@@ -69,7 +69,7 @@ public class TowerSelectionManager : MonoBehaviour
     {
         if (selectedTower == null || placement == null) return;
 
-       // upgradeCost = upgradeCost = Mathf.RoundToInt(baseUpgradeCost * Mathf.Pow(upgradeCostMultiplier, selectedTower.level));
+
 
       
         if (placement.currentGold < upgradeCost)
@@ -100,10 +100,14 @@ ui.upgradeCost = upgradeCost;
    public void SellTower()
 {
     if (selectedTower == null || placement == null) return;
-
-    TowerPrice priceComponent = selectedTower.GetComponent<TowerPrice>();
+    
+    TowerPrice priceComponent = selectedTower.GetComponentInParent<TowerPrice>();
+if (priceComponent == null)
+    priceComponent = selectedTower.GetComponentInChildren<TowerPrice>();
         if (priceComponent == null)
-        {
+        { 
+            
+           
             Debug.LogWarning("Tower has no TowerPrice component, cannot calculate refund.");
             return;
         }
@@ -118,7 +122,8 @@ Destroy(effect, 1.5f); // destroys after 1.5 seconds
     // Free the occupied tile in the placement dictionary
     placement.FreeCellAtPosition(selectedTower.transform.position);
 
-    Debug.Log($"Sold tower for {refund} gold. Current gold: {placement.currentGold}");
+        Debug.Log($"Sold tower for {refund} gold. Current gold: {placement.currentGold}");
+    
 
     Destroy(selectedTower.gameObject);
     selectedTower = null;

@@ -43,6 +43,9 @@ public class PoisonSprayerTower : MonoBehaviour
 
     private void Update()
     {
+        if (targeting.isPreview)
+            return;
+
         if (!Application.isPlaying)
         {
             UpdateConeVisualsInEditor();
@@ -89,7 +92,7 @@ public class PoisonSprayerTower : MonoBehaviour
     {
         if (targeting == null) return;
 
-        Vector3 forward = transform.forward;
+        Vector3 forward = towerHead != null ? towerHead.forward : transform.forward;
         Vector3 origin = firePoint ? firePoint.position : transform.position;
         Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
 
@@ -98,10 +101,12 @@ public class PoisonSprayerTower : MonoBehaviour
             if (e == null || !e.isActiveAndEnabled) continue;
 
             Vector3 dir = e.transform.position - origin;
-            float dist = dir.magnitude;
+            Vector3 flatForward = new Vector3(forward.x, 0f, forward.z).normalized;
+            Vector3 flatDir = new Vector3(dir.x, 0f, dir.z);
+            float dist = flatDir.magnitude;
             if (dist > coneLength) continue;
 
-            float angle = Vector3.Angle(forward, dir);
+            float angle = Vector3.Angle(flatForward, flatDir);
             if (angle > coneAngle * 0.5f) continue;
 
             e.TakeDamage(towerDamage * (1 + targeting.heightStep / 10f) * damageInterval);
@@ -123,7 +128,7 @@ public class PoisonSprayerTower : MonoBehaviour
 
                 poisonedEnemies[e] = new PoisonInfo
                 {
-                    timeLeft = poisonDuration,
+                    timeLeft = poisonDuration * (1 + targeting.heightStep / 10f),
                     poisonVFX = fx,
                     fadeCoroutine = null
                 };
@@ -247,7 +252,6 @@ public class PoisonSprayerTower : MonoBehaviour
 
         Vector3 forward = towerHead ? towerHead.forward : transform.forward;
         Vector3 startPos = firePoint.position;
-        //startPos.y = 0f;
 
         Quaternion leftRot = Quaternion.Euler(0, -coneAngle / 2f, 0);
         Quaternion rightRot = Quaternion.Euler(0, coneAngle / 2f, 0);

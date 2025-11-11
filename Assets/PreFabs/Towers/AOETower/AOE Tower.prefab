@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6589502814531371540}
   - component: {fileID: 7063783473128802822}
   - component: {fileID: 7011039834772888906}
+  - component: {fileID: 507906855639900166}
   m_Layer: 0
   m_Name: AOE Tower
   m_TagString: Untagged
@@ -75,8 +76,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerTargeting
   targetMode: 0
   range: 1
+  fireRate: 0
+  damage: 0
+  level: 0
   rotateTowardsTarget: 1
   rotationSpeed: 3
+  heightStep: 0
   towerHead: {fileID: 5887325728259326358}
   currentTarget: {fileID: 0}
   isPreview: 0
@@ -208,6 +213,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerPrice
   price: 50
+--- !u!114 &507906855639900166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 59694984630866679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 347b94673f959fa44af856842523b4c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerSelectable
+  towerName: 
+  range: 0
+  level: 0
+  damage: 0
+  targeting: {fileID: 0}
 --- !u!1 &540569423449371306
 GameObject:
   m_ObjectHideFlags: 0

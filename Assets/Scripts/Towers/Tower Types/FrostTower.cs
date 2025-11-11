@@ -8,7 +8,6 @@ public class FrostTower : MonoBehaviour
     [Header("Cone Settings")]
     [Range(90, 360)] public float coneAngle = 360f;
     [Min(0f)] public float coneLength = 1f;
-    private WaveSpawner waveSpawner;
 
     [Header("Damage Settings")]
     public float towerDamage = 10f;
@@ -26,19 +25,19 @@ public class FrostTower : MonoBehaviour
 
     private class SlowInfo
     {
+        public int towerCount; // how many towers are currently applying the slow
         public float timeLeft;
         public float originalSpeed;
-        public Renderer renderer;
-        public Color originalColor;
-        public bool refreshedThisFrame;
+        public Renderer[] renderers;
+        public Color[] originalColors;
     }
 
-    private readonly Dictionary<Enemy, SlowInfo> slowedEnemies = new();
+    // Shared across all towers to handle multiple sources
+    private static readonly Dictionary<Enemy, SlowInfo> slowedEnemies = new();
 
     private void Awake()
     {
         targeting = GetComponent<TowerTargeting>();
-        waveSpawner = FindFirstObjectByType<WaveSpawner>();
     }
 
     private void Update()
@@ -46,13 +45,6 @@ public class FrostTower : MonoBehaviour
         if (!Application.isPlaying || targeting.isPreview)
         {
             UpdateConeVisualsInEditor();
-            return;
-        }
-
-        if (waveSpawner == null || !waveSpawner.waveInProgress)
-        {
-            StopFrost();
-            ClearAllSlows();
             return;
         }
 
@@ -76,53 +68,49 @@ public class FrostTower : MonoBehaviour
         Vector3 forward = transform.forward;
         Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
 
-        // Mark all slowed enemies as unrefreshed
-        foreach (var info in slowedEnemies.Values)
-            info.refreshedThisFrame = false;
-
         foreach (Enemy e in enemies)
         {
-            if (e == null || !e.isActiveAndEnabled)
-                continue;
+            if (e == null || !e.isActiveAndEnabled) continue;
 
             Vector3 dir = e.transform.position - origin;
-            float dist = dir.magnitude;
-            if (dist > coneLength)
-                continue;
+            if (dir.magnitude > coneLength) continue;
+            if (Vector3.Angle(forward, dir) > coneAngle / 2f) continue;
 
-            float angle = Vector3.Angle(forward, dir);
-            if (angle > coneAngle / 2f)
-                continue;
-
-            // Base damage per tick
+            // Apply damage
             e.TakeDamage(towerDamage * damageInterval * (1 + targeting.heightStep / 10f));
 
-            if (!applySlow)
-                continue;
+            if (!applySlow) continue;
+
+            float newDuration = slowDuration * (1 + targeting.heightStep / 10f);
 
             if (slowedEnemies.TryGetValue(e, out var info))
             {
-                info.timeLeft = slowDuration * (1 + targeting.heightStep / 10f);
-                info.refreshedThisFrame = true;
+                // Already slowed: increment tower count and refresh duration if higher
+                info.towerCount++;
+                if (newDuration > info.timeLeft)
+                    info.timeLeft = newDuration;
             }
             else
             {
-                Renderer r = e.GetComponentInChildren<Renderer>();
-                float originalSpeed = e.moveSpeed;
-                Color originalColor = r != null ? r.material.color : Color.white;
+                // First tower to slow this enemy
+                Renderer[] renderers = e.GetComponentsInChildren<Renderer>();
+                Color[] originalColors = new Color[renderers.Length];
+                for (int i = 0; i < renderers.Length; i++)
+                    originalColors[i] = renderers[i].material.color;
 
+                float originalSpeed = e.moveSpeed;
                 e.moveSpeed *= Mathf.Clamp01(1f - slowPercent * (1 + targeting.heightStep / 10f) / 100f);
 
-                if (r != null)
-                    r.material.color = slowColor;
+                for (int i = 0; i < renderers.Length; i++)
+                    renderers[i].material.color = slowColor;
 
                 slowedEnemies[e] = new SlowInfo
                 {
-                    timeLeft = slowDuration * (1 + targeting.heightStep / 10f),
+                    towerCount = 1,
+                    timeLeft = newDuration,
                     originalSpeed = originalSpeed,
-                    renderer = r,
-                    originalColor = originalColor,
-                    refreshedThisFrame = true
+                    renderers = renderers,
+                    originalColors = originalColors
                 };
             }
         }
@@ -141,18 +129,24 @@ public class FrostTower : MonoBehaviour
 
             if (e == null || !e.isActiveAndEnabled)
             {
-                RestoreEnemyState(e, info);
+                RestoreEnemy(e, info);
                 toRemove.Add(e);
                 continue;
             }
 
-            if (!info.refreshedThisFrame)
+            // Count down duration only if no tower applied this frame
+            if (info.towerCount == 0)
                 info.timeLeft -= Time.deltaTime;
 
-            if (info.timeLeft <= 0)
+            if (info.timeLeft <= 0f)
             {
-                RestoreEnemyState(e, info);
+                RestoreEnemy(e, info);
                 toRemove.Add(e);
+            }
+            else
+            {
+                // Reset towerCount for next frame, each tower will re-apply
+                info.towerCount = 0;
             }
         }
 
@@ -160,25 +154,17 @@ public class FrostTower : MonoBehaviour
             slowedEnemies.Remove(e);
     }
 
-    private void RestoreEnemyState(Enemy e, SlowInfo info)
+    private void RestoreEnemy(Enemy e, SlowInfo info)
     {
         if (e == null) return;
+
         e.moveSpeed = info.originalSpeed;
-        if (info.renderer != null)
-            info.renderer.material.color = info.originalColor;
-    }
 
-    private void ClearAllSlows()
-    {
-        foreach (var kvp in slowedEnemies)
-            RestoreEnemyState(kvp.Key, kvp.Value);
-        slowedEnemies.Clear();
-    }
-
-    private void StopFrost()
-    {
-        if (frostEffect != null && frostEffect.isPlaying)
-            frostEffect.Stop();
+        if (info.renderers != null)
+        {
+            for (int i = 0; i < info.renderers.Length; i++)
+                info.renderers[i].material.color = info.originalColors[i];
+        }
     }
 
     private void UpdateConeVisualsInEditor()

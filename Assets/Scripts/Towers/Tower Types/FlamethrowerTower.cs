@@ -43,6 +43,9 @@ public class FlamethrowerTower : MonoBehaviour
 
     private void Update()
     {
+        if (targeting.isPreview)
+            return;
+
         if (!Application.isPlaying)
         {
             UpdateConeVisualsInEditor();
@@ -88,9 +91,8 @@ public class FlamethrowerTower : MonoBehaviour
     private void ApplyConeDamage()
     {
         Vector3 origin = transform.position;
-        Vector3 forward = transform.forward;
+        Vector3 forward = towerHead != null ? towerHead.forward : transform.forward;
 
-        // Flatten Y for horizontal-only targeting
         Vector3 flatForward = new Vector3(forward.x, 0f, forward.z).normalized;
 
         Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
@@ -238,7 +240,7 @@ public class FlamethrowerTower : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (towerHead == null) return;
+        if (towerHead == null || firePoint == null) return;
 
         SetConeLength(targeting != null ? targeting.range : coneLength);
         Gizmos.color = Application.isPlaying ? Color.red : Color.yellow;
