@@ -1,53 +1,57 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-[System.Serializable]
 public class Deck
 {
-    public List<Card> allCards;
-    private Queue<Card> drawPile;
-    private List<Card> discardPile;
+    public List<Card> allCards = new List<Card>();
+    private List<Card> drawPile = new List<Card>();
+    private List<Card> discardPile = new List<Card>();
+
+
+public List<Card> GetDrawPile() => drawPile != null ? new List<Card>(drawPile) : new List<Card>();
+public List<Card> GetDiscardPile() => discardPile ?? new List<Card>();
 
     public void Initialize()
     {
-        if (allCards == null)
-            allCards = new List<Card>();
-
-        var shuffled = allCards.OrderBy(x => Random.value).ToList();
-        drawPile = new Queue<Card>(shuffled);
-        discardPile = new List<Card>();
+        drawPile = new List<Card>(allCards);
+        Shuffle(drawPile);
     }
 
     public Card DrawCard()
     {
-        if (drawPile == null) Initialize();
-
         if (drawPile.Count == 0)
-            Reshuffle();
+            RefillFromDiscard();
 
         if (drawPile.Count == 0)
             return null;
 
-        return drawPile.Dequeue();
+        Card card = drawPile[0];
+        drawPile.RemoveAt(0);
+        return card;
     }
 
     public void Discard(Card card)
     {
-        discardPile.Add(card);
+        if (card != null)
+            discardPile.Add(card);
     }
 
-    private void Reshuffle()
+    private void RefillFromDiscard()
     {
-        if (discardPile.Count == 0)
-            return;
-
-        discardPile = discardPile.OrderBy(x => Random.value).ToList();
-        foreach (var card in discardPile)
-            drawPile.Enqueue(card);
-
+        drawPile = new List<Card>(discardPile);
         discardPile.Clear();
+        Shuffle(drawPile);
     }
 
-    public int Remaining => drawPile?.Count ?? 0;
+    private void Shuffle(List<Card> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            int rand = Random.Range(i, list.Count);
+            (list[i], list[rand]) = (list[rand], list[i]);
+        }
+    }
+
+    public int DrawCount => drawPile.Count;
+    public int DiscardCount => discardPile.Count;
 }
