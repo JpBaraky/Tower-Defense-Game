@@ -16,6 +16,7 @@ public class TowerTargeting : MonoBehaviour
     public bool rotateTowardsTarget = true;
     public float rotationSpeed = 5f;
     public int heightStep;
+    [HideInInspector] public bool isAimed;
 
     [Header("References")]
     public Transform towerHead;
@@ -61,15 +62,17 @@ public class TowerTargeting : MonoBehaviour
     }
 
     private void RotateTowards(Transform target)
-    {
-        Vector3 dir = (target.position - transform.position).normalized;
-        Quaternion lookRot = Quaternion.LookRotation(dir, Vector3.up);
+{
+    Vector3 dir = (target.position - transform.position).normalized;
+    Quaternion lookRot = Quaternion.LookRotation(dir, Vector3.up);
 
-        if (towerHead != null)
-            towerHead.rotation = Quaternion.Lerp(towerHead.rotation, lookRot, Time.deltaTime * rotationSpeed);
-        else
-            transform.rotation = Quaternion.Lerp(transform.rotation, lookRot, Time.deltaTime * rotationSpeed);
-    }
+    Transform rotator = towerHead != null ? towerHead : transform;
+    rotator.rotation = Quaternion.Lerp(rotator.rotation, lookRot, Time.deltaTime * rotationSpeed);
+
+    // check alignment
+    float angleDiff = Quaternion.Angle(rotator.rotation, lookRot);
+    isAimed = angleDiff < 5f; // adjust tolerance
+}
 
     private Enemy SelectTarget()
     {

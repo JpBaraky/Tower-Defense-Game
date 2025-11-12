@@ -41,11 +41,12 @@ public class TowerShooter : MonoBehaviour
 
         fireCooldown -= Time.deltaTime;
 
-        if (fireCooldown <= 0f)
-        {
-            Fire();
-            fireCooldown = 1f / fireRate;
-        }
+        if (fireCooldown <= 0f && targeting.isAimed)
+{
+    Fire();
+    fireCooldown = 1f / fireRate;
+}
+        
     }
 
     private void Fire()
