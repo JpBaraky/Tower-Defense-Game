@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2562074192962604276}
   - component: {fileID: 343816860869032296}
   - component: {fileID: 5925356790468457156}
+  - component: {fileID: 8494180489426963699}
   - component: {fileID: 9000492089534662803}
   - component: {fileID: 219492027121958303}
   - component: {fileID: 3096455162784487334}
@@ -81,6 +82,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 1
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8494180489426963699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769032729890079710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adbd0ccda8a61f240ae1d87711f6b6eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardDragHandler
 --- !u!114 &9000492089534662803
 MonoBehaviour:
   m_ObjectHideFlags: 0

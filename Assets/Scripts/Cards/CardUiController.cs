@@ -12,29 +12,20 @@ public class CardUIController : MonoBehaviour
 
     private Card cardData;
 
-    public void SetCard(Card data)
+    public void SetData(Card data, HandManager manager)
     {
         cardData = data;
 
         nameText.text = data.cardName;
         descriptionText.text = data.description;
         costText.text = data.cost.ToString();
-        if(data.artwork != null)
-        artworkImage.sprite = data.artwork;
+
+        if (data.artwork != null)
+            artworkImage.sprite = data.artwork;
+
+        GetComponent<CardInteractable>().Setup(data, manager);
+        GetComponent<CardDragHandler>().Setup(data, manager);
     }
 
     public Card GetCardData() => cardData;
-    public void SetData(Card data, HandManager manager)
-{
-    cardData = data;
-
-    nameText.text = data.cardName;
-    costText.text = data.cost.ToString();
-    descriptionText.text = data.description;
-    if(data.artwork != null)
-        artworkImage.sprite = data.artwork;
-
-    GetComponent<CardInteractable>().Setup(data, manager);
-}
-    
 }

@@ -3,20 +3,29 @@ using UnityEngine.EventSystems;
 
 public class CardInteractable : MonoBehaviour, IPointerClickHandler
 {
-    private Card cardData;
+    private Card card;
     private HandManager handManager;
 
-    public void Setup(Card data, HandManager manager)
+    public void Setup(Card cardData, HandManager manager)
     {
-        cardData = data;
+        card = cardData;
         handManager = manager;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Clicked card: " + cardData.cardName);
+        if (card == null || handManager == null) return;
 
-        // Later this becomes "play card"
-        handManager.PlayCard(cardData);
+        // Left click = play the card
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            handManager.PlayCard(card);
+        }
+
+        // Right click = discard
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            handManager.DiscardCard(card);
+        }
     }
 }

@@ -16,6 +16,9 @@ public class HandManager : MonoBehaviour
 
     public List<Card> CurrentHand => hand;
 
+    public delegate void HandChanged(List<Card> currentHand);
+    public event HandChanged OnHandChanged;
+
     void Awake()
     {
         hand = new List<Card>();
@@ -27,9 +30,6 @@ public class HandManager : MonoBehaviour
         RefreshHandUI();
         OnHandChanged?.Invoke(hand);
     }
-
-    public delegate void HandChanged(List<Card> currentHand);
-    public event HandChanged OnHandChanged;
 
     public void DrawCard()
     {
@@ -79,23 +79,22 @@ public class HandManager : MonoBehaviour
     }
 
     // ---------------------------------------
-    // UI Refresh
+    // UI REFRESH
     // ---------------------------------------
     private void RefreshHandUI()
     {
-        // destroy existing UI cards
+        // destroy old UIs
         foreach (var ui in spawnedCardUIs)
             Destroy(ui);
 
         spawnedCardUIs.Clear();
 
-        // spawn new UI cards
+        // spawn new UIs
         foreach (var card in hand)
         {
             var ui = Instantiate(cardUIPrefab, handUIParent);
             ui.GetComponent<CardUIController>().SetData(card, this);
             spawnedCardUIs.Add(ui);
-            
         }
     }
 }
