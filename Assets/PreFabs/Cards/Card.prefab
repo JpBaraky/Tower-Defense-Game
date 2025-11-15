@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5925356790468457156}
   - component: {fileID: 9000492089534662803}
   - component: {fileID: 219492027121958303}
+  - component: {fileID: 3096455162784487334}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -116,6 +117,18 @@ MonoBehaviour:
   m_FlexibleWidth: 0
   m_FlexibleHeight: 0
   m_LayoutPriority: 1
+--- !u!114 &3096455162784487334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769032729890079710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d0c4a721479cd4989ab866b997c4a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardInteractable
 --- !u!1 &3286120762882093455
 GameObject:
   m_ObjectHideFlags: 0

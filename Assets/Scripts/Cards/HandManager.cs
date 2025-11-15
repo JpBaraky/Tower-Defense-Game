@@ -93,8 +93,9 @@ public class HandManager : MonoBehaviour
         foreach (var card in hand)
         {
             var ui = Instantiate(cardUIPrefab, handUIParent);
-            ui.GetComponent<CardUIController>().SetCard(card);
+            ui.GetComponent<CardUIController>().SetData(card, this);
             spawnedCardUIs.Add(ui);
+            
         }
     }
 }
