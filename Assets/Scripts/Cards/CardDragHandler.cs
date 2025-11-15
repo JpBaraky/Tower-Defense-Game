@@ -1,29 +1,42 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CardDragHandler : MonoBehaviour, 
+public class CardDragHandler : MonoBehaviour,
     IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private Transform originalParent;
-    private Canvas canvas;
-    private RectTransform rect;
     private Card card;
-    private HandManager handManager;
+    private HandManager manager;
 
-    public void Setup(Card data, HandManager manager)
+    private Canvas canvas;
+    private CanvasGroup canvasGroup;
+    private RectTransform rectTransform;
+
+    private Transform originalParent;
+    private Vector3 originalPosition;
+
+    public void Setup(Card data, HandManager handManager)
     {
         card = data;
-        handManager = manager;
+        manager = handManager;
+    }
 
-        rect = GetComponent<RectTransform>();
+    void Awake()
+    {
+        rectTransform = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (canvas == null) return;
+        if (canvasGroup == null) return;
 
         originalParent = transform.parent;
+        originalPosition = rectTransform.anchoredPosition;
+
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.alpha = 0.7f;
+
         transform.SetParent(canvas.transform, true);
     }
 
@@ -34,24 +47,39 @@ public class CardDragHandler : MonoBehaviour,
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
             eventData.position,
-            canvas.worldCamera,
-            out Vector2 localPos
-        );
+            eventData.pressEventCamera,
+            out Vector2 localPoint);
 
-        rect.localPosition = localPos;
+        rectTransform.anchoredPosition = localPoint;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        // If released above a threshold = consider "played"
-        if (eventData.position.y > Screen.height * 0.6f)
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.alpha = 1f;
+
+        bool played = TryPlayCard(eventData);
+
+        if (!played)
         {
-            handManager.PlayCard(card);
-            return;
+            // return to original place
+            rectTransform.SetParent(originalParent);
+            rectTransform.anchoredPosition = originalPosition;
+        }
+    }
+
+    private bool TryPlayCard(PointerEventData eventData)
+    {
+        if (card == null || manager == null) return false;
+
+        // optional: check drop zone tag or layer
+        // here we simply auto-play when dragging up
+        if (eventData.position.y > Screen.height * 0.7f)
+        {
+            manager.RequestPlayCard(card);
+            return true;
         }
 
-        // Otherwise return to hand
-        transform.SetParent(originalParent, false);
-        rect.anchoredPosition = Vector2.zero;
+        return false;
     }
 }

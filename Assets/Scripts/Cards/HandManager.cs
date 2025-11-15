@@ -47,9 +47,32 @@ public class HandManager : MonoBehaviour
         }
 
         hand.Add(drawn);
-
         RefreshHandUI();
         OnHandChanged?.Invoke(hand);
+    }
+
+    // External API used by CardInteractable/drag handler
+    public void RequestPlayCard(Card card)
+    {
+        if (card == null || !hand.Contains(card)) return;
+
+        if (ResourceManager.Instance == null)
+        {
+            Debug.LogWarning("No ResourceManager present. Playing card without cost check.");
+            PlayCard(card);
+            return;
+        }
+
+        if (!ResourceManager.Instance.CanAfford(card.cost))
+        {
+            Debug.Log("Cannot play card, not enough mana: " + card.cardName);
+            return;
+        }
+
+        // spend then play
+        bool spent = ResourceManager.Instance.Spend(card.cost);
+        if (spent)
+            PlayCard(card);
     }
 
     public void DiscardCard(Card card)
@@ -62,17 +85,20 @@ public class HandManager : MonoBehaviour
 
         hand.Remove(card);
         deck.Discard(card);
-
         RefreshHandUI();
         OnHandChanged?.Invoke(hand);
     }
 
-    public void PlayCard(Card card)
+    // internal execution after validation
+    private void PlayCard(Card card)
     {
         if (!hand.Contains(card)) return;
 
         hand.Remove(card);
         deck.Discard(card);
+
+        // TODO: trigger card effect here (spawn tower, etc.)
+        Debug.Log("Played card: " + card.cardName);
 
         RefreshHandUI();
         OnHandChanged?.Invoke(hand);
@@ -92,9 +118,18 @@ public class HandManager : MonoBehaviour
         // spawn new UIs
         foreach (var card in hand)
         {
-            var ui = Instantiate(cardUIPrefab, handUIParent);
-            ui.GetComponent<CardUIController>().SetData(card, this);
-            spawnedCardUIs.Add(ui);
+            var uiObj = Instantiate(cardUIPrefab, handUIParent);
+            var controller = uiObj.GetComponent<CardUIController>();
+            controller.SetData(card, this); // controller will also hook up drag/click handlers
+            spawnedCardUIs.Add(uiObj);
         }
+    }
+
+    // helper for CardUI to query affordability (used on UI updates)
+    public bool CanPlay(Card card)
+    {
+        if (card == null) return false;
+        if (ResourceManager.Instance == null) return true; // if no RM, allow
+        return ResourceManager.Instance.CanAfford(card.cost);
     }
 }
