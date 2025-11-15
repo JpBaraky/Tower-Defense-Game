@@ -3,12 +3,16 @@ using UnityEngine;
 
 public class HandManager : MonoBehaviour
 {
+    [Header("Hand Rules")]
     [SerializeField] private int maxHandSize = 5;
+
+    [Header("UI")]
+    [SerializeField] private Transform handUIParent;
+    [SerializeField] private GameObject cardUIPrefab;
+
     private Deck deck;
     private List<Card> hand;
-
-    public delegate void HandChanged(List<Card> currentHand);
-    public event HandChanged OnHandChanged;
+    private readonly List<GameObject> spawnedCardUIs = new();
 
     public List<Card> CurrentHand => hand;
 
@@ -20,9 +24,12 @@ public class HandManager : MonoBehaviour
     public void Initialize(Deck sourceDeck)
     {
         deck = sourceDeck;
-        // start empty — no opening draw
+        RefreshHandUI();
         OnHandChanged?.Invoke(hand);
     }
+
+    public delegate void HandChanged(List<Card> currentHand);
+    public event HandChanged OnHandChanged;
 
     public void DrawCard()
     {
@@ -40,6 +47,8 @@ public class HandManager : MonoBehaviour
         }
 
         hand.Add(drawn);
+
+        RefreshHandUI();
         OnHandChanged?.Invoke(hand);
     }
 
@@ -53,14 +62,39 @@ public class HandManager : MonoBehaviour
 
         hand.Remove(card);
         deck.Discard(card);
+
+        RefreshHandUI();
         OnHandChanged?.Invoke(hand);
     }
 
     public void PlayCard(Card card)
     {
         if (!hand.Contains(card)) return;
+
         hand.Remove(card);
         deck.Discard(card);
+
+        RefreshHandUI();
         OnHandChanged?.Invoke(hand);
+    }
+
+    // ---------------------------------------
+    // UI Refresh
+    // ---------------------------------------
+    private void RefreshHandUI()
+    {
+        // destroy existing UI cards
+        foreach (var ui in spawnedCardUIs)
+            Destroy(ui);
+
+        spawnedCardUIs.Clear();
+
+        // spawn new UI cards
+        foreach (var card in hand)
+        {
+            var ui = Instantiate(cardUIPrefab, handUIParent);
+            ui.GetComponent<CardUIController>().SetCard(card);
+            spawnedCardUIs.Add(ui);
+        }
     }
 }
