@@ -594,7 +594,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5ec32a0740d9db4b8db2ff456228594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HandManager
-  maxHandSize: 5
+  maxHandSize: 9
   handUIParent: {fileID: 195002609}
   cardUIPrefab: {fileID: 769032729890079710, guid: b4dfa69d02230e1428cbe73bcc61d3f8, type: 3}
 --- !u!114 &371832713

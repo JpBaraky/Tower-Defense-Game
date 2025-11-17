@@ -15,7 +15,8 @@ MonoBehaviour:
   cardName: Misdirection
   description: Drawn 2 cards
   cost: 0
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: fe58c62892030bd4392d9c0fe64c7a77, type: 3}
   effectType: 3
   effectValue: 2
   spawnPrefab: {fileID: 0}
+  customEffect: {fileID: 0}
