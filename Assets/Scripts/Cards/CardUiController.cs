@@ -67,7 +67,7 @@ public class CardUIController : MonoBehaviour
         UpdateAffordability();
     }
 
-    private void UpdateAffordability()
+    public void UpdateAffordability()
     {
         if (cardData == null) return;
 
@@ -88,5 +88,5 @@ public class CardUIController : MonoBehaviour
             costBackground.color = affordable ? affordableColor : unaffordableColor;
     }
 
-    public Card GetCardData() => cardData;
+    public Card GetCardData() => cardData; 
 }

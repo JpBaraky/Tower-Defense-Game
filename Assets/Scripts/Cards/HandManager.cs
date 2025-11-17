@@ -66,7 +66,7 @@ public bool RequestPlayCard(Card card)
     if (!ResourceManager.Instance.CanAfford(card.cost))
     {
         Debug.Log("Cannot play card, not enough mana: " + card.cardName);
-        RefreshHandUI();
+       // RefreshHandUI();
         return false;
         
     }
@@ -112,7 +112,7 @@ public bool RequestPlayCard(Card card)
     // ---------------------------------------
     // UI REFRESH
     // ---------------------------------------
-    private void RefreshHandUI()
+    public void RefreshHandUI()
     {
         // destroy old UIs
         foreach (var ui in spawnedCardUIs)

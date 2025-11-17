@@ -17,11 +17,7 @@ public class HandTester : MonoBehaviour
         handManager = GetComponent<HandManager>();
         handManager.Initialize(deck);
 
-        handManager.OnHandChanged += cards =>
-        {
-          
-            foreach (var c in cards) Debug.Log(" - " + c.cardName);
-        };
+      
     }
 
     void Update()
