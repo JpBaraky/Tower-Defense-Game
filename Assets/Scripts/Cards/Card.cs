@@ -14,6 +14,7 @@ public enum CardEffectType
 public class Card : ScriptableObject
 {
     public string cardName;
+    [TextArea]
     public string description;
     public int cost;
     public Sprite artwork;
@@ -22,5 +23,11 @@ public class Card : ScriptableObject
     public int effectValue;
     public GameObject spawnPrefab;
     public CardCustomEffect customEffect;
+    #if UNITY_EDITOR
+    private void OnValidate()
+    {
+        cardName = name;
+    }
+#endif
 
 }

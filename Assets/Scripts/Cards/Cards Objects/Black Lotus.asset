@@ -16,6 +16,7 @@ MonoBehaviour:
   description: 'Gain 3 mana '
   cost: 0
   artwork: {fileID: 0}
-  effectType: 4
+  effectType: 3
   effectValue: 3
   spawnPrefab: {fileID: 0}
+  customEffect: {fileID: 0}
