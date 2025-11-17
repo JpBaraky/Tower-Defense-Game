@@ -4,38 +4,38 @@ using UnityEngine.EventSystems;
 public class CardDragHandler : MonoBehaviour,
     IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private Card card;
-    private HandManager manager;
-
-    private Canvas canvas;
-    private CanvasGroup canvasGroup;
-    private RectTransform rectTransform;
-
     private Transform originalParent;
-    private Vector3 originalPosition;
+    private Canvas canvas;
+    private RectTransform rect;
+    private CanvasGroup cg;
 
-    public void Setup(Card data, HandManager handManager)
-    {
-        card = data;
-        manager = handManager;
-    }
+    private Card card;
+    private HandManager handManager;
 
     void Awake()
     {
-        rectTransform = GetComponent<RectTransform>();
-        canvasGroup = GetComponent<CanvasGroup>();
+        rect = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
+
+        cg = GetComponent<CanvasGroup>();
+        if (cg == null)
+            cg = gameObject.AddComponent<CanvasGroup>();
+    }
+
+    public void Setup(Card data, HandManager manager)
+    {
+        card = data;
+        handManager = manager;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (canvasGroup == null) return;
+        if (canvas == null) return;
 
         originalParent = transform.parent;
-        originalPosition = rectTransform.anchoredPosition;
 
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.alpha = 0.7f;
+        cg.blocksRaycasts = false;
+        cg.alpha = 0.75f;
 
         transform.SetParent(canvas.transform, true);
     }
@@ -47,39 +47,40 @@ public class CardDragHandler : MonoBehaviour,
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
             eventData.position,
-            eventData.pressEventCamera,
-            out Vector2 localPoint);
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera,
+            out Vector2 localPos
+        );
 
-        rectTransform.anchoredPosition = localPoint;
+        rect.localPosition = localPos;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+public void OnEndDrag(PointerEventData eventData)
+{
+    cg.blocksRaycasts = true;
+    cg.alpha = 1f;
+
+    bool played = false;
+
+    if (card != null && handManager != null)
     {
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.alpha = 1f;
+        float pointerY = eventData.position.y;
+        float threshold = Screen.height * 0.4f;
 
-        bool played = TryPlayCard(eventData);
-
-        if (!played)
+        if (pointerY > threshold)
         {
-            // return to original place
-            rectTransform.SetParent(originalParent);
-            rectTransform.anchoredPosition = originalPosition;
+            played = handManager.RequestPlayCard(card);
         }
     }
 
-    private bool TryPlayCard(PointerEventData eventData)
+    if (!played)
     {
-        if (card == null || manager == null) return false;
-
-        // optional: check drop zone tag or layer
-        // here we simply auto-play when dragging up
-        if (eventData.position.y > Screen.height * 0.7f)
+        // return to hand
+        if (originalParent != null)
         {
-            manager.RequestPlayCard(card);
-            return true;
+            transform.SetParent(originalParent, false);
+            rect.anchoredPosition = Vector2.zero;
         }
-
-        return false;
     }
+}
+
 }

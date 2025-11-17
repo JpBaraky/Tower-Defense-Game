@@ -52,28 +52,33 @@ public class HandManager : MonoBehaviour
     }
 
     // External API used by CardInteractable/drag handler
-    public void RequestPlayCard(Card card)
+public bool RequestPlayCard(Card card)
+{
+    if (card == null || !hand.Contains(card)) 
+        return false;
+
+    if (ResourceManager.Instance == null)
     {
-        if (card == null || !hand.Contains(card)) return;
-
-        if (ResourceManager.Instance == null)
-        {
-            Debug.LogWarning("No ResourceManager present. Playing card without cost check.");
-            PlayCard(card);
-            return;
-        }
-
-        if (!ResourceManager.Instance.CanAfford(card.cost))
-        {
-            Debug.Log("Cannot play card, not enough mana: " + card.cardName);
-            return;
-        }
-
-        // spend then play
-        bool spent = ResourceManager.Instance.Spend(card.cost);
-        if (spent)
-            PlayCard(card);
+        PlayCard(card);
+        return true;
     }
+
+    if (!ResourceManager.Instance.CanAfford(card.cost))
+    {
+        Debug.Log("Cannot play card, not enough mana: " + card.cardName);
+        RefreshHandUI();
+        return false;
+        
+    }
+
+    bool spent = ResourceManager.Instance.Spend(card.cost);
+    if (!spent) 
+        return false;
+
+    PlayCard(card);
+    return true;
+}
+
 
     public void DiscardCard(Card card)
     {

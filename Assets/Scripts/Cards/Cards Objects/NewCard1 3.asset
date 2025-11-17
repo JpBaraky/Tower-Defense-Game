@@ -16,6 +16,6 @@ MonoBehaviour:
   description: 
   artwork: {fileID: 0}
   type: 0
-  cost: 0
+  cost: 2
   towerPrefab: {fileID: 0}
   spellEffectId: 

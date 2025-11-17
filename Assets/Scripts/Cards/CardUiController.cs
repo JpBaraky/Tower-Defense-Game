@@ -12,17 +12,22 @@ public class CardUIController : MonoBehaviour
     [SerializeField] private TMP_Text costText;
 
     [Header("Affordability visuals")]
-    [SerializeField] private Image costBackground; // optional colored background you can tint
+    [SerializeField] private Image costBackground;
     [SerializeField] private Color affordableColor = Color.white;
     [SerializeField] private Color unaffordableColor = Color.gray;
 
     private Card cardData;
     private HandManager handManager;
+
     private CanvasGroup canvasGroup;
+    private CardInteractable interactable;
+    private CardDragHandler dragHandler;
 
     void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
+        interactable = GetComponent<CardInteractable>();
+        dragHandler = GetComponent<CardDragHandler>();
     }
 
     public void SetData(Card data, HandManager manager)
@@ -30,19 +35,28 @@ public class CardUIController : MonoBehaviour
         cardData = data;
         handManager = manager;
 
+        // --- card interaction setup ---
+        if (interactable != null)
+            interactable.Setup(cardData, handManager);
+
+        if (dragHandler != null)
+            dragHandler.Setup(cardData, handManager);
+
+        // --- UI visuals ---
         nameText.text = data.cardName;
         descriptionText.text = data.description;
         costText.text = data.cost.ToString();
-        if (data.artwork != null) artworkImage.sprite = data.artwork;
+
+        if (data.artwork != null)
+            artworkImage.sprite = data.artwork;
 
         UpdateAffordability();
 
-        // subscribe to mana changes so UI updates automatically
         if (ResourceManager.Instance != null)
             ResourceManager.Instance.OnManaChanged += OnManaChanged;
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
         if (ResourceManager.Instance != null)
             ResourceManager.Instance.OnManaChanged -= OnManaChanged;
@@ -55,15 +69,20 @@ public class CardUIController : MonoBehaviour
 
     private void UpdateAffordability()
     {
-        bool affordable = true;
-        if (cardData != null)
-        {
-            affordable = handManager != null ? handManager.CanPlay(cardData) : (ResourceManager.Instance?.CanAfford(cardData.cost) ?? true);
-        }
+        if (cardData == null) return;
 
-        // visual treatment: desaturate/alpha and tint cost
-        canvasGroup.alpha = affordable ? 1f : 0.6f;
-        canvasGroup.blocksRaycasts = affordable; // prevent clicks if unaffordable
+        // check affordability
+        bool affordable = handManager != null
+            ? handManager.CanPlay(cardData)
+            : (ResourceManager.Instance?.CanAfford(cardData.cost) ?? true);
+
+        // visual feedback only
+        canvasGroup.alpha = affordable ? 1f : 0.55f;
+
+        // IMPORTANT:
+        // Do NOT block raycasts, otherwise drag stops working.
+        // Click logic is handled inside CardInteractable anyway.
+        canvasGroup.blocksRaycasts = true;
 
         if (costBackground != null)
             costBackground.color = affordable ? affordableColor : unaffordableColor;

@@ -14,7 +14,13 @@ public class CardInteractable : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (card == null || handManager == null) return;
+        if (card == null || handManager == null)
+        {
+            Debug.LogWarning("CardInteractable clicked but not initialized.");
+            return;
+        }
+
+        Debug.Log("Card clicked: " + card.name);
 
         if (eventData.button == PointerEventData.InputButton.Left)
         {
