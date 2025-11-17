@@ -9,8 +9,8 @@ public class HandManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Transform handUIParent;
     [SerializeField] private GameObject cardUIPrefab;
-
-    private Deck deck;
+    [HideInInspector]
+    public Deck deck;
     private List<Card> hand;
     private readonly List<GameObject> spawnedCardUIs = new();
 
@@ -95,19 +95,23 @@ public bool RequestPlayCard(Card card)
     }
 
     // internal execution after validation
-    private void PlayCard(Card card)
-    {
-        if (!hand.Contains(card)) return;
+private void PlayCard(Card card)
+{
+    if (!hand.Contains(card)) return;
 
-        hand.Remove(card);
-        deck.Discard(card);
+    hand.Remove(card);
+    deck.Discard(card);
 
-        // TODO: trigger card effect here (spawn tower, etc.)
-        Debug.Log("Played card: " + card.cardName);
+    CardEffectExecutor.Execute(
+        card,
+        this,                       // hand manager
+        ResourceManager.Instance    // your real resource manager
+    );
 
-        RefreshHandUI();
-        OnHandChanged?.Invoke(hand);
-    }
+    RefreshHandUI();
+    OnHandChanged?.Invoke(hand);
+}
+
 
     // ---------------------------------------
     // UI REFRESH
@@ -137,4 +141,5 @@ public bool RequestPlayCard(Card card)
         if (ResourceManager.Instance == null) return true; // if no RM, allow
         return ResourceManager.Instance.CanAfford(card.cost);
     }
+   
 }
