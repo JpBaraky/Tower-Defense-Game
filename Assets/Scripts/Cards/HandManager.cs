@@ -9,8 +9,8 @@ public class HandManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Transform handUIParent;
     [SerializeField] private GameObject cardUIPrefab;
-
-    private Deck deck;
+    [HideInInspector]
+    public Deck deck;
     private List<Card> hand;
     private readonly List<GameObject> spawnedCardUIs = new();
 
@@ -47,10 +47,38 @@ public class HandManager : MonoBehaviour
         }
 
         hand.Add(drawn);
-
         RefreshHandUI();
         OnHandChanged?.Invoke(hand);
     }
+
+    // External API used by CardInteractable/drag handler
+public bool RequestPlayCard(Card card)
+{
+    if (card == null || !hand.Contains(card)) 
+        return false;
+
+    if (ResourceManager.Instance == null)
+    {
+        PlayCard(card);
+        return true;
+    }
+
+    if (!ResourceManager.Instance.CanAfford(card.cost))
+    {
+        Debug.Log("Cannot play card, not enough mana: " + card.cardName);
+       // RefreshHandUI();
+        return false;
+        
+    }
+
+    bool spent = ResourceManager.Instance.Spend(card.cost);
+    if (!spent) 
+        return false;
+
+    PlayCard(card);
+    return true;
+}
+
 
     public void DiscardCard(Card card)
     {
@@ -62,26 +90,33 @@ public class HandManager : MonoBehaviour
 
         hand.Remove(card);
         deck.Discard(card);
-
         RefreshHandUI();
         OnHandChanged?.Invoke(hand);
     }
 
-    public void PlayCard(Card card)
-    {
-        if (!hand.Contains(card)) return;
+    // internal execution after validation
+private void PlayCard(Card card)
+{
+    if (!hand.Contains(card)) return;
 
-        hand.Remove(card);
-        deck.Discard(card);
+    hand.Remove(card);
+    deck.Discard(card);
 
-        RefreshHandUI();
-        OnHandChanged?.Invoke(hand);
-    }
+    CardEffectExecutor.Execute(
+        card,
+        this,                       // hand manager
+        ResourceManager.Instance    // your real resource manager
+    );
+
+    RefreshHandUI();
+    OnHandChanged?.Invoke(hand);
+}
+
 
     // ---------------------------------------
     // UI REFRESH
     // ---------------------------------------
-    private void RefreshHandUI()
+    public void RefreshHandUI()
     {
         // destroy old UIs
         foreach (var ui in spawnedCardUIs)
@@ -92,9 +127,19 @@ public class HandManager : MonoBehaviour
         // spawn new UIs
         foreach (var card in hand)
         {
-            var ui = Instantiate(cardUIPrefab, handUIParent);
-            ui.GetComponent<CardUIController>().SetData(card, this);
-            spawnedCardUIs.Add(ui);
+            var uiObj = Instantiate(cardUIPrefab, handUIParent);
+            var controller = uiObj.GetComponent<CardUIController>();
+            controller.SetData(card, this); // controller will also hook up drag/click handlers
+            spawnedCardUIs.Add(uiObj);
         }
     }
+
+    // helper for CardUI to query affordability (used on UI updates)
+    public bool CanPlay(Card card)
+    {
+        if (card == null) return false;
+        if (ResourceManager.Instance == null) return true; // if no RM, allow
+        return ResourceManager.Instance.CanAfford(card.cost);
+    }
+   
 }

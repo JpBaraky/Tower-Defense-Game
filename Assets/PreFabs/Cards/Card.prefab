@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 9000492089534662803}
   - component: {fileID: 219492027121958303}
   - component: {fileID: 3096455162784487334}
+  - component: {fileID: 399696919233707216}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -94,6 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adbd0ccda8a61f240ae1d87711f6b6eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardDragHandler
+  returnDuration: 0.25
 --- !u!114 &9000492089534662803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110,6 +112,9 @@ MonoBehaviour:
   nameText: {fileID: 6021676590879960443}
   descriptionText: {fileID: 7117759358578410030}
   costText: {fileID: 6659253405925637079}
+  costBackground: {fileID: 6151801058334199340}
+  affordableColor: {r: 1, g: 1, b: 1, a: 1}
+  unaffordableColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!114 &219492027121958303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,6 +147,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93d0c4a721479cd4989ab866b997c4a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardInteractable
+--- !u!225 &399696919233707216
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769032729890079710}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &3286120762882093455
 GameObject:
   m_ObjectHideFlags: 0
@@ -564,15 +581,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 8
+  m_fontSize: 11
   m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 5
-  m_fontSizeMax: 8
+  m_fontSizeMax: 11
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0

@@ -14,16 +14,19 @@ public class CardInteractable : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (card == null || handManager == null) return;
-
-        // Left click = play the card
-        if (eventData.button == PointerEventData.InputButton.Left)
+        if (card == null || handManager == null)
         {
-            handManager.PlayCard(card);
+            Debug.LogWarning("CardInteractable clicked but not initialized.");
+            return;
         }
 
-        // Right click = discard
-        if (eventData.button == PointerEventData.InputButton.Right)
+        Debug.Log("Card clicked: " + card.name);
+
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            handManager.RequestPlayCard(card);
+        }
+        else if (eventData.button == PointerEventData.InputButton.Right)
         {
             handManager.DiscardCard(card);
         }

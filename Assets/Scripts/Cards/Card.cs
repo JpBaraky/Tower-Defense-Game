@@ -1,26 +1,33 @@
 using UnityEngine;
 
-public enum CardType
+public enum CardEffectType
 {
-    Tower,
-    Spell,
-    Trap,
-    Upgrade
+    None,
+    DealDamage,
+    SpawnObject,
+    DrawCards,
+    GainMana,
+    Custom
 }
 
-[CreateAssetMenu(fileName = "NewCard", menuName = "Cards/Card")]
+[CreateAssetMenu(menuName = "Card/New Card")]
 public class Card : ScriptableObject
 {
-    [Header("General Info")]
     public string cardName;
-    [TextArea] public string description;
-    public Sprite artwork;
-    public CardType type;
+    [TextArea]
+    public string description;
     public int cost;
+    public Sprite artwork;
 
-    [Header("Tower Data")]
-    public GameObject towerPrefab; // Only if CardType == Tower
+    public CardEffectType effectType;
+    public int effectValue;
+    public GameObject spawnPrefab;
+    public CardCustomEffect customEffect;
+    #if UNITY_EDITOR
+    private void OnValidate()
+    {
+        cardName = name;
+    }
+#endif
 
-    [Header("Spell Data")]
-    public string spellEffectId; // Identifier for script lookup later
 }

@@ -5,11 +5,12 @@ public class Deck
 {
     public List<Card> allCards = new List<Card>();
     private List<Card> drawPile = new List<Card>();
-    private List<Card> discardPile = new List<Card>();
+    private List<Card> discardPile = new List<Card>(); 
 
 
 public List<Card> GetDrawPile() => drawPile != null ? new List<Card>(drawPile) : new List<Card>();
 public List<Card> GetDiscardPile() => discardPile ?? new List<Card>();
+
 
     public void Initialize()
     {

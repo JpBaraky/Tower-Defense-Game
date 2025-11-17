@@ -17,12 +17,7 @@ public class HandTester : MonoBehaviour
         handManager = GetComponent<HandManager>();
         handManager.Initialize(deck);
 
-        handManager.OnHandChanged += cards =>
-        {
-            Debug.Log("Hand now has " + cards.Count + " cards:");
-            foreach (var c in cards)
-                Debug.Log(" - " + c.cardName);
-        };
+      
     }
 
     void Update()
@@ -38,7 +33,7 @@ public class HandTester : MonoBehaviour
             {
                 var card = handManager.CurrentHand[0];
                 handManager.DiscardCard(card);
-                Debug.Log("Discarded: " + card.cardName);
+               
             }
             else
             {
