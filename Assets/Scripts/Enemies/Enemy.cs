@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
     public float moveSpeed = 0.5f;
     public float rewardGold = 5f;
     public FloatingText floatingTextPrefab;
-    private EnemyStats enemyStats;
+    private EnemyStats enemyStats; 
     
     [Header("Optional Path Progress")]
     public float pathProgress; // useful for "First" targeting logic later

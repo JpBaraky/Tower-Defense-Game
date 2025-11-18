@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Card
   cardName: Simple Tower
   description: Low damage single target tower
-  cost: 2
+  cost: 1
   artwork: {fileID: 0}
   effectType: 3
   effectValue: 0

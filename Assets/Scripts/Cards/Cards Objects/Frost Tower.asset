@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 962eb3821edc5b749aac78a50c7ca33c, type: 3}
-  m_Name: Meteor
+  m_Name: Frost Tower
   m_EditorClassIdentifier: Assembly-CSharp::Card
-  cardName: Meteor
-  description: Damages all Enemies for 20 Damage
-  cost: 4
-  artwork: {fileID: 21300000, guid: 95e6d2bc3342a904181cd0e12c76d236, type: 3}
-  effectType: 1
-  effectValue: 200
-  spawnPrefab: {fileID: 0}
+  cardName: Frost Tower
+  description: Low damage single target tower
+  cost: 2
+  artwork: {fileID: 0}
+  effectType: 3
+  effectValue: 0
+  spawnPrefab: {fileID: 7364006415610255843, guid: a42e7176eda6b734494f7d44ef8d279f, type: 3}
   customEffect: {fileID: 0}

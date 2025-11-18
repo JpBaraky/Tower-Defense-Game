@@ -45,7 +45,31 @@ public static class CardEffectExecutor
 
     private static void DealDamage(int amount)
     {
-        Debug.Log($"[Effect] DealDamage: {amount}");
+  {
+        Enemy[] enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+
+        foreach (Enemy e in enemies)
+        {
+            if (e == null) continue;
+
+            // Apply damage
+            e.TakeDamage(amount);
+
+            // Flash coroutine
+            var sr = e.GetComponent<SpriteRenderer>();
+            if (sr != null)
+                e.StartCoroutine(Flash(sr, 0.1f));
+        }
+    }
+    }
+
+    private static System.Collections.IEnumerator Flash(SpriteRenderer sr, float duration)
+    {
+        Color original = sr.color;
+        sr.color = Color.red;
+        yield return new WaitForSeconds(duration);
+        sr.color = original;
+    
     }
 
     private static void GainMana(ResourceManager rm, int amount)
@@ -70,7 +94,7 @@ public static class CardEffectExecutor
             return;
         }
 
-        // Replace with tower/spell placement later
+        
         Object.Instantiate(card.spawnPrefab, Vector3.zero, Quaternion.identity);
     }
     private static void SpawnTower(Card card)

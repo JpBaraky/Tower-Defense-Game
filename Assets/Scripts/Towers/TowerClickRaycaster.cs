@@ -11,22 +11,8 @@ public class TowerClickRaycaster : MonoBehaviour
     {
   
 
-foreach (var col in FindObjectsOfType<Collider>())
-{
-    Debug.Log(col.name + " layer: " + LayerMask.LayerToName(col.gameObject.layer));
-}
-foreach (var c in FindObjectsOfType<Collider>())
-{
-    if (c.isTrigger)
-        Debug.Log("Trigger: " + c.name);
-}
-foreach (var col in FindObjectsOfType<Collider>())
-{
-    var rb = col.attachedRigidbody;
-    if (rb == null)
-        Debug.Log("NO RB: " + col.name);
-}
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+
+ if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
