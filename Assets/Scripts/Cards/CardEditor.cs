@@ -35,11 +35,15 @@ public class CardEditor : Editor
 
             case CardEffectType.SpawnObject:
                 EditorGUILayout.PropertyField(spawnPrefab);
-                break;
+                break; 
+             case CardEffectType.SpawnTower:
+                EditorGUILayout.PropertyField(spawnPrefab);
+                break;   
 
             case CardEffectType.Custom:
                 EditorGUILayout.PropertyField(customEffect);
                 break;
+
         }
 
         serializedObject.ApplyModifiedProperties();

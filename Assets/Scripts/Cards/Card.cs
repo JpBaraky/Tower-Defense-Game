@@ -5,6 +5,7 @@ public enum CardEffectType
     None,
     DealDamage,
     SpawnObject,
+    SpawnTower,
     DrawCards,
     GainMana,
     Custom

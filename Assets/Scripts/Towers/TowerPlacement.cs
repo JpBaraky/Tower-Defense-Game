@@ -30,6 +30,7 @@ public class TowerPlacement : MonoBehaviour
     private Renderer[] previewRenderers;
     private readonly Dictionary<Vector3Int, bool> occupiedTiles = new();
     private readonly Dictionary<Vector3Int, bool> isGroundTile = new();
+      public static TowerPlacement Instance { get; private set; }
 
     private bool canPlaceTower;
     private bool changedPosition = true;
@@ -37,6 +38,7 @@ public class TowerPlacement : MonoBehaviour
 
     void Start()
     {
+        Instance = this;
         currentGold = startingGold;
         if (mainCamera == null) mainCamera = Camera.main;
 
@@ -54,6 +56,7 @@ public class TowerPlacement : MonoBehaviour
 
     void Update()
     {
+        
         goldDisplay.text = currentGold.ToString();
 
         if (!canPlaceTower)

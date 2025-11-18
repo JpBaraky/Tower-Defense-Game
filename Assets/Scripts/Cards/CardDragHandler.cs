@@ -5,7 +5,8 @@ using System.Collections;
 public class CardDragHandler : MonoBehaviour,
     IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private Transform originalParent;
+    private Transform originalParent; 
+    private Quaternion originalRotation;
     private Canvas canvas;
     private RectTransform rect;
     private CanvasGroup cg;
@@ -42,6 +43,7 @@ public class CardDragHandler : MonoBehaviour,
     public void OnBeginDrag(PointerEventData eventData)
     { 
         cardUIController = eventData.pointerPress.GetComponent<CardUIController>();
+        originalRotation = eventData.pointerPress.transform.rotation;
         cardHandFanLayout.isDragging = true;
         if (canvas == null) return;
 
@@ -56,6 +58,7 @@ public class CardDragHandler : MonoBehaviour,
 
         cg.blocksRaycasts = false;
         cg.alpha = 0.75f;
+        rect.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
         //transform.SetParent(canvas.transform, true);
     }
@@ -98,7 +101,7 @@ public class CardDragHandler : MonoBehaviour,
             transform.SetParent(originalParent, false);
             cardUIController.UpdateAffordability();
             StartReturnAnimation();
-           
+          
         }
     }
 
@@ -128,5 +131,7 @@ public class CardDragHandler : MonoBehaviour,
         returnRoutine = null;
       
         cardHandFanLayout.isDragging = false;
+          rect.transform.rotation = originalRotation;
     }
+   
 }

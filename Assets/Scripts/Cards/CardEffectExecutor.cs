@@ -1,5 +1,7 @@
 using UnityEngine;
 
+
+
 public static class CardEffectExecutor
 {
     public static void Execute(Card card, HandManager hand, ResourceManager resources)
@@ -22,6 +24,10 @@ public static class CardEffectExecutor
 
             case CardEffectType.SpawnObject:
                 SpawnObject(card);
+                break; 
+
+            case CardEffectType.SpawnTower:
+                SpawnTower(card);
                 break;
 
             case CardEffectType.Custom:
@@ -39,7 +45,7 @@ public static class CardEffectExecutor
 
     private static void DealDamage(int amount)
     {
-        Debug.Log($"[Effect] DealDamage: {amount} (Hook enemy system here)");
+        Debug.Log($"[Effect] DealDamage: {amount}");
     }
 
     private static void GainMana(ResourceManager rm, int amount)
@@ -67,6 +73,21 @@ public static class CardEffectExecutor
         // Replace with tower/spell placement later
         Object.Instantiate(card.spawnPrefab, Vector3.zero, Quaternion.identity);
     }
+    private static void SpawnTower(Card card)
+    {
+        if (card.spawnPrefab == null)
+        {
+            Debug.LogWarning($"[Effect] {card.cardName} has no spawn prefab.");
+            return;
+        }
+
+         TowerPlacement towerPlacement;
+         towerPlacement = TowerPlacement.Instance; 
+         towerPlacement.towerPrefab = card.spawnPrefab;
+      
+        towerPlacement.CanPlaceTower();
+         }
+    
 
     // ----------------------------------------------------
     // Custom Effects
