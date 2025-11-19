@@ -105,6 +105,7 @@ private void PlayCard(Card card)
     CardEffectExecutor.Execute(
         card,
         this,                       // hand manager
+                              // target
         ResourceManager.Instance    // your real resource manager
     );
 

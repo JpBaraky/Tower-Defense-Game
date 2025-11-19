@@ -2,13 +2,18 @@ using UnityEngine;
 
 public enum CardEffectType
 {
-    None,
-    DealDamage,
+    Damage,
+    GainMana,
+    DrawCards,
     SpawnObject,
     SpawnTower,
-    DrawCards,
-    GainMana,
     Custom
+}
+public enum TargetType
+{
+    None,
+    Single,
+    All
 }
 
 [CreateAssetMenu(menuName = "Card/New Card")]
@@ -19,6 +24,8 @@ public class Card : ScriptableObject
     public string description;
     public int cost;
     public Sprite artwork;
+    public TargetType targetType;
+
 
     public CardEffectType effectType;
     public int effectValue;

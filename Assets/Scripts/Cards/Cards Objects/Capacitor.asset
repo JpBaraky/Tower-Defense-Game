@@ -16,7 +16,8 @@ MonoBehaviour:
   description: Doubles your current Mana
   cost: 1
   artwork: {fileID: 21300000, guid: 11575f6e92ecaff44a5105491611eb95, type: 3}
-  effectType: 6
+  targetType: 0
+  effectType: 5
   effectValue: 0
   spawnPrefab: {fileID: 0}
   customEffect: {fileID: 11400000, guid: 404b335035159344f80ced655deef616, type: 2}

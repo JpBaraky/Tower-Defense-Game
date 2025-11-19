@@ -16,7 +16,7 @@ MonoBehaviour:
   description: Low damage single target tower
   cost: 2
   artwork: {fileID: 0}
-  effectType: 3
+  effectType: 4
   effectValue: 0
   spawnPrefab: {fileID: 7364006415610255843, guid: 3808145b3dcc099429f78ba5cc34fa2e, type: 3}
   customEffect: {fileID: 0}
