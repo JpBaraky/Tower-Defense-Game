@@ -1,70 +1,194 @@
 fileFormatVersion: 2
 guid: e9f55563610bfb248a409eb462676f8b
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: body
-    100002: ear.L
-    100004: ear.R
-    100006: leg.B.L
-    100008: leg.B.R
-    100010: leg.F.L
-    100012: leg.F.R
-    100014: Rig
-    100016: root
-    100018: tail
-    100020: tail.01
-    100022: //RootNode
-    100024: Zebra_LOD1
-    100026: Elephant_LOD1
-    100028: trunk_arm
-    100030: trunk_base
-    100032: trunk_inb
-    100034: trunk_middle
-    100036: Dog_LOD1
-    100038: ear.L.01
-    100040: ear.R.01
-    400000: body
-    400002: ear.L
-    400004: ear.R
-    400006: leg.B.L
-    400008: leg.B.R
-    400010: leg.F.L
-    400012: leg.F.R
-    400014: Rig
-    400016: root
-    400018: tail
-    400020: tail.01
-    400022: //RootNode
-    400024: Zebra_LOD1
-    400026: Elephant_LOD1
-    400028: trunk_arm
-    400030: trunk_base
-    400032: trunk_inb
-    400034: trunk_middle
-    400036: Dog_LOD1
-    400038: ear.L.01
-    400040: ear.R.01
-    4300000: Zebra_LOD1
-    4300002: Elephant_LOD1
-    4300004: Dog_LOD1
-    7400000: Bounce
-    7400002: Clicked
-    7400004: Idle
-    7400006: Munch
-    7400008: Roll
-    7400010: Run
-    7400012: Spin
-    7400014: Swim
-    7400016: Walk
-    7400018: Idle_A
-    7400020: Idle_B
-    7400022: Idle_C
-    9500000: //RootNode
-    13700000: Zebra_LOD1
-    13700002: Elephant_LOD1
-    13700004: Dog_LOD1
-    2186277476908879412: ImportLogs
+  serializedVersion: 24200
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: body
+  - first:
+      1: 100002
+    second: ear.L
+  - first:
+      1: 100004
+    second: ear.R
+  - first:
+      1: 100006
+    second: leg.B.L
+  - first:
+      1: 100008
+    second: leg.B.R
+  - first:
+      1: 100010
+    second: leg.F.L
+  - first:
+      1: 100012
+    second: leg.F.R
+  - first:
+      1: 100014
+    second: Rig
+  - first:
+      1: 100016
+    second: root
+  - first:
+      1: 100018
+    second: tail
+  - first:
+      1: 100020
+    second: tail.01
+  - first:
+      1: 100022
+    second: //RootNode
+  - first:
+      1: 100024
+    second: Zebra_LOD1
+  - first:
+      1: 100026
+    second: Elephant_LOD1
+  - first:
+      1: 100028
+    second: trunk_arm
+  - first:
+      1: 100030
+    second: trunk_base
+  - first:
+      1: 100032
+    second: trunk_inb
+  - first:
+      1: 100034
+    second: trunk_middle
+  - first:
+      1: 100036
+    second: Dog_LOD1
+  - first:
+      1: 100038
+    second: ear.L.01
+  - first:
+      1: 100040
+    second: ear.R.01
+  - first:
+      4: 400000
+    second: body
+  - first:
+      4: 400002
+    second: ear.L
+  - first:
+      4: 400004
+    second: ear.R
+  - first:
+      4: 400006
+    second: leg.B.L
+  - first:
+      4: 400008
+    second: leg.B.R
+  - first:
+      4: 400010
+    second: leg.F.L
+  - first:
+      4: 400012
+    second: leg.F.R
+  - first:
+      4: 400014
+    second: Rig
+  - first:
+      4: 400016
+    second: root
+  - first:
+      4: 400018
+    second: tail
+  - first:
+      4: 400020
+    second: tail.01
+  - first:
+      4: 400022
+    second: //RootNode
+  - first:
+      4: 400024
+    second: Zebra_LOD1
+  - first:
+      4: 400026
+    second: Elephant_LOD1
+  - first:
+      4: 400028
+    second: trunk_arm
+  - first:
+      4: 400030
+    second: trunk_base
+  - first:
+      4: 400032
+    second: trunk_inb
+  - first:
+      4: 400034
+    second: trunk_middle
+  - first:
+      4: 400036
+    second: Dog_LOD1
+  - first:
+      4: 400038
+    second: ear.L.01
+  - first:
+      4: 400040
+    second: ear.R.01
+  - first:
+      43: 4300000
+    second: Zebra_LOD1
+  - first:
+      43: 4300002
+    second: Elephant_LOD1
+  - first:
+      43: 4300004
+    second: Dog_LOD1
+  - first:
+      74: 7400000
+    second: Bounce
+  - first:
+      74: 7400002
+    second: Clicked
+  - first:
+      74: 7400004
+    second: Idle
+  - first:
+      74: 7400006
+    second: Munch
+  - first:
+      74: 7400008
+    second: Roll
+  - first:
+      74: 7400010
+    second: Run
+  - first:
+      74: 7400012
+    second: Spin
+  - first:
+      74: 7400014
+    second: Swim
+  - first:
+      74: 7400016
+    second: Walk
+  - first:
+      74: 7400018
+    second: Idle_A
+  - first:
+      74: 7400020
+    second: Idle_B
+  - first:
+      74: 7400022
+    second: Idle_C
+  - first:
+      95: 9500000
+    second: //RootNode
+  - first:
+      137: 13700000
+    second: Zebra_LOD1
+  - first:
+      137: 13700002
+    second: Elephant_LOD1
+  - first:
+      137: 13700004
+    second: Dog_LOD1
+  - first:
+      41386430: 2186277476908879412
+    second: ImportLogs
   externalObjects:
   - first:
       type: UnityEngine:Material
@@ -72,7 +196,7 @@ ModelImporter:
       name: Mat_Dog
     second: {fileID: 2100000, guid: dd0d4ac3d9b388249a45e37650f300b4, type: 2}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 1
     materialSearch: 1
     materialLocation: 0
@@ -81,9 +205,8 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -101,6 +224,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Bounce
       takeName: Rig|Bounce
+      internalID: 0
       firstFrame: 0
       lastFrame: 10
       wrapMode: 0
@@ -109,7 +233,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -155,6 +279,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Clicked
       takeName: Rig|Clicked
+      internalID: 0
       firstFrame: 0
       lastFrame: 10
       wrapMode: 0
@@ -209,6 +334,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Munch
       takeName: Rig|Munch
+      internalID: 0
       firstFrame: 0
       lastFrame: 10
       wrapMode: 0
@@ -263,6 +389,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Roll
       takeName: Rig|Roll
+      internalID: 0
       firstFrame: 0
       lastFrame: 10
       wrapMode: 0
@@ -317,6 +444,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Run
       takeName: Rig|Run
+      internalID: 0
       firstFrame: 0
       lastFrame: 10
       wrapMode: 0
@@ -371,6 +499,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Spin
       takeName: Rig|Spin
+      internalID: 0
       firstFrame: 0
       lastFrame: 10
       wrapMode: 0
@@ -425,6 +554,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Swim
       takeName: Rig|Swim
+      internalID: 0
       firstFrame: 0
       lastFrame: 10
       wrapMode: 0
@@ -479,6 +609,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Walk
       takeName: Rig|Walk
+      internalID: 0
       firstFrame: 0
       lastFrame: 10
       wrapMode: 0
@@ -533,6 +664,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Idle_A
       takeName: Rig|Idle
+      internalID: 0
       firstFrame: 0
       lastFrame: 10
       wrapMode: 0
@@ -587,6 +719,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Idle_B
       takeName: Rig|Idle
+      internalID: 0
       firstFrame: 11
       lastFrame: 21
       wrapMode: 0
@@ -641,6 +774,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Idle_C
       takeName: Rig|Idle
+      internalID: 0
       firstFrame: 22
       lastFrame: 32
       wrapMode: 0
@@ -699,25 +833,39 @@ ModelImporter:
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 0
     importBlendShapes: 1
     importCameras: 0
     importLights: 0
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
     indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 0.01
-    hasPreviousCalculatedGlobalScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -726,10 +874,10 @@ ModelImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -739,13 +887,19 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: root
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

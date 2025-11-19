@@ -82,7 +82,9 @@ MonoBehaviour:
   moveSpeed: 0.5
   rewardGold: 5
   floatingTextPrefab: {fileID: 2387702292447526891, guid: 3e433432b8fb3534b89eac9a116acdf3, type: 3}
-  pathProgress: 0
+  smokeDelay: 0
+  smokeEffectPrefab: {fileID: 2478918448625118873, guid: c002c487ee2819d4eb7b617ea6976d2b, type: 3}
+  destroyDelay: 0
 --- !u!1 &3177002884117460235
 GameObject:
   m_ObjectHideFlags: 0

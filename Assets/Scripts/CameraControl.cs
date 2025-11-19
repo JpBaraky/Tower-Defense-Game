@@ -46,9 +46,7 @@ public class TowerDefenseCamera : MonoBehaviour
     void Update()
     {
       
-    if (Physics.Raycast(Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue()), out var hit))
-        Debug.Log("Hit: " + hit.collider.name);
-
+   
         HandleKeyboardMovement();
         HandleMouseDrag();
         HandleEdgeScroll();

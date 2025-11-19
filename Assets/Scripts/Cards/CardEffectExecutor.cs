@@ -45,22 +45,28 @@ public static class CardEffectExecutor
 
     private static void DealDamage(int amount)
     {
-  {
-        Enemy[] enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+ Enemy[] enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
 
         foreach (Enemy e in enemies)
         {
             if (e == null) continue;
 
-            // Apply damage
             e.TakeDamage(amount);
 
-            // Flash coroutine
-            var sr = e.GetComponent<SpriteRenderer>();
-            if (sr != null)
-                e.StartCoroutine(Flash(sr, 0.1f));
+            Renderer r = e.GetComponentInChildren<Renderer>();
+            if (r != null)
+                e.StartCoroutine(FlashMaterial(r, 0.1f));
         }
     }
+
+    private static System.Collections.IEnumerator FlashMaterial(Renderer r, float duration)
+    {
+        Material mat = r.material; // uses instance
+        Color original = mat.color;
+
+        mat.color = Color.red;
+        yield return new WaitForSeconds(duration);
+        mat.color = original;
     }
 
     private static System.Collections.IEnumerator Flash(SpriteRenderer sr, float duration)

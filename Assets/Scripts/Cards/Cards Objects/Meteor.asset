@@ -17,6 +17,6 @@ MonoBehaviour:
   cost: 4
   artwork: {fileID: 21300000, guid: 95e6d2bc3342a904181cd0e12c76d236, type: 3}
   effectType: 1
-  effectValue: 200
+  effectValue: 100
   spawnPrefab: {fileID: 0}
   customEffect: {fileID: 0}
