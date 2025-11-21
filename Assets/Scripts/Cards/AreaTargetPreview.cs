@@ -33,7 +33,7 @@ public class AreaTargetPreview : MonoBehaviour
     /// Call to configure the preview before use.
     /// groundY = the Y coordinate where the circle should lie (usually 0).
     /// </summary>
-    public void Initialize(float r, float groundY = 0.1f, int segmentCount = 64)
+    public void Initialize(float r, float groundY = 0.2f, int segmentCount = 64)
     {
         radius = Mathf.Max(0.01f, r);
         this.groundY = groundY;

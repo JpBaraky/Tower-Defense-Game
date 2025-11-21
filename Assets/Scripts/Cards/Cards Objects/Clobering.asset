@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 962eb3821edc5b749aac78a50c7ca33c, type: 3}
+  m_Name: Clobering
+  m_EditorClassIdentifier: Assembly-CSharp::Card
+  cardName: Cloberring
+  description: Damages all Enemies for 20 Damage
+  cost: 1
+  artwork: {fileID: 21300000, guid: c4235008cd3741b428770c4920159835, type: 3}
+  targetType: 3
+  areaRadius: 0.5
+  effectType: 5
+  effectValue: 5
+  spawnPrefab: {fileID: 0}
+  customEffect: {fileID: 11400000, guid: 656e73fc94785da4385defd03e62aa26, type: 2}

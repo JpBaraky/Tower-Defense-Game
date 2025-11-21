@@ -10,17 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52a9fbe4602e9504d9cdb055602600e1, type: 3}
-  m_Name: Dog
+  m_Name: Rabbit
   m_EditorClassIdentifier: Assembly-CSharp::EnemyType
-  enemyName: Dog
-  prefab: {fileID: 287413184781287655, guid: ce90143e9279c47458596430e95ebc8c, type: 3}
+  enemyName: Rabbit
+  prefab: {fileID: 1627393932811526, guid: 8ea1ad11a396a7843a8083c09e7ddd3b, type: 3}
   baseHealth: 100
-  baseSpeed: 0.5
+  baseSpeed: 3
   baseDamage: 1
   baseReward: 5
   isFlying: 0
   isBoss: 0
-  spawnsOnDeath:
-  - enemyToSpawn: {fileID: 11400000}
-    count: 2
-    spreadRadius: 0.1
+  spawnsOnDeath: []

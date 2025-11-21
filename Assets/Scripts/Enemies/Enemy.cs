@@ -14,24 +14,37 @@ public class Enemy : MonoBehaviour
     private Animator anim;
 
     [Header("Death Settings")]
-    public float smokeDelay = 0.6f;        // Time after animation ends
-    public GameObject smokeEffectPrefab;   // Poof effect
-    public float destroyDelay = 1.2f;      // After smoke spawn
+    public float smokeDelay = 0.6f;
+    public GameObject smokeEffectPrefab;
+    public float destroyDelay = 1.2f;
 
     public bool IsDead => currentHealth <= 0f;
     private bool isDying = false;
+
+    [Header("Config")]
+    public EnemyType enemyType;
+
+    private WaveSpawner spawner;   // cached reference
+    private EnemyFollowPath followPath; // cached path script
+
 
     void Start()
     {
         enemyStats = GetComponent<EnemyStats>();
         anim = GetComponentInChildren<Animator>();
+        followPath = GetComponent<EnemyFollowPath>();
+        spawner = FindFirstObjectByType<WaveSpawner>();
 
-        maxHealth = enemyStats.health;
-        moveSpeed = enemyStats.speed;
-        rewardGold = enemyStats.reward;
+        if (enemyType != null)
+        {
+            maxHealth = enemyType.baseHealth;
+            moveSpeed = enemyType.baseSpeed;
+            rewardGold = enemyType.baseReward;
+        }
 
         currentHealth = maxHealth;
     }
+
 
     public void TakeDamage(float amount)
     {
@@ -42,29 +55,79 @@ public class Enemy : MonoBehaviour
             Die();
     }
 
+
     private void Die()
     {
         if (isDying) return;
         isDying = true;
 
-        GrantReward();
+        SpawnChildren();   // important: children spawn before destruction
 
-        // Stop movement immediately
+        GrantReward();
         moveSpeed = 0f;
 
-        // Trigger death animation
         if (anim != null)
             anim.SetTrigger("Bounce");
 
         StartCoroutine(DeathSequence());
     }
 
+
+    // ===============================================================
+    // CHILD SPAWNING — uses proper spawn override and path continuation
+    // ===============================================================
+    private void SpawnChildren()
+    {
+        if (enemyType == null || enemyType.spawnsOnDeath == null) return;
+        if (spawner == null) return;
+
+        TileNode parentNode = null;
+
+        // Only works if this enemy actually has a followPath
+        if (followPath != null && followPath.nextNode != null)
+            parentNode = followPath.nextNode.GetComponent<TileNode>();
+
+        foreach (var entry in enemyType.spawnsOnDeath)
+        {
+            if (entry.enemyToSpawn == null || entry.enemyToSpawn.prefab == null)
+                continue;
+
+            for (int i = 0; i < entry.count; i++)
+            {
+                // Spawn point around corpse
+                Vector2 offset = Random.insideUnitCircle * entry.spreadRadius;
+                Vector3 spawnPos = transform.position + (Vector3)offset;
+
+                // Create enemy
+                GameObject child = Instantiate(entry.enemyToSpawn.prefab, spawnPos, Quaternion.identity);
+
+                // Assign type
+                Enemy childEnemy = child.GetComponent<Enemy>();
+                childEnemy.enemyType = entry.enemyToSpawn;
+
+                // Path
+                EnemyFollowPath childPath = child.GetComponent<EnemyFollowPath>();
+                childPath.nextNode = this.followPath.nextNode;
+                childPath.currentIndex = this.followPath.currentIndex;
+
+                // Override spawn position to prevent teleporting
+                childPath.SetSpawnPosition(spawnPos);
+
+                if (parentNode != null)
+                {
+                    // Continue exactly from parent's next node
+                    childPath.SetCurrentNode(parentNode);
+                }
+            }
+        }
+    }
+
+
+
     private IEnumerator DeathSequence()
     {
-        // Wait for animation state to appear
         yield return null;
 
-        // Wait until death animation fully ends
         float animLength = 0.3f;
 
         if (anim != null)
@@ -75,10 +138,9 @@ public class Enemy : MonoBehaviour
 
         yield return new WaitForSeconds(animLength + smokeDelay);
 
-        // Spawn smoke effect
         if (smokeEffectPrefab != null)
         {
-          GameObject smoke =  Instantiate(
+            GameObject smoke = Instantiate(
                 smokeEffectPrefab,
                 transform.position + Vector3.up * 0.1f,
                 Quaternion.identity
@@ -86,11 +148,12 @@ public class Enemy : MonoBehaviour
             Destroy(smoke, 2f);
         }
 
-        // Destroy after optional delay
         yield return new WaitForSeconds(destroyDelay);
 
         Destroy(gameObject);
     }
+
+
 
     private void GrantReward()
     {
