@@ -13,7 +13,9 @@ public enum TargetType
 {
     None,
     Single,
-    All
+   
+    All,
+     Area
 }
 
 [CreateAssetMenu(menuName = "Card/New Card")]
@@ -25,6 +27,7 @@ public class Card : ScriptableObject
     public int cost;
     public Sprite artwork;
     public TargetType targetType;
+    public float areaRadius;
 
 
     public CardEffectType effectType;

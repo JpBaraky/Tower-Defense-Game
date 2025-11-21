@@ -15,7 +15,10 @@ public static class CardEffectExecutor
 
             case TargetType.All:
                 ExecuteAll(card, hand, resources);
-                break;
+                break; 
+            case TargetType.Area:
+    ExecuteArea(card, hand, resources);
+    break; 
 
             case TargetType.Single:
                 ExecuteSingle(card, hand, resources);
@@ -223,4 +226,47 @@ public static class CardEffectExecutor
         yield return new WaitForSeconds(t);
         mat.color = original;
     }
+   private static void ExecuteArea(Card card, HandManager hand, ResourceManager resources)
+{
+    if (card.areaRadius <= 0f)
+    {
+        Debug.LogWarning("Card has no valid area radius.");
+        return;
+    }
+
+    GameObject previewGO = new GameObject("AreaPreview");
+    AreaTargetPreview preview = previewGO.AddComponent<AreaTargetPreview>();
+    preview.Initialize(card.areaRadius);
+
+    preview.OnConfirm = (Vector3 center) =>
+    {
+        Enemy[] enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+
+        foreach (Enemy e in enemies)
+        {
+            if (e == null) continue;
+
+            float dist = Vector3.Distance(new Vector3(e.transform.position.x, 0f, e.transform.position.z),
+                                         new Vector3(center.x, 0f, center.z));
+            if (dist > card.areaRadius) continue;
+
+            switch (card.effectType)
+            {
+                case CardEffectType.Damage:
+                    ApplyDamageWithFlash(e, card.effectValue);
+                    break;
+
+                case CardEffectType.Custom:
+                    card.customEffect?.ExecuteOnTarget(card, e, hand, resources);
+                    break;
+
+                default:
+                    Debug.LogWarning($"{card.effectType} does not support Area targeting.");
+                    break;
+            }
+        }
+    };
+}
+
+
 }

@@ -13,6 +13,7 @@ public class CardEditor : Editor
         SerializedProperty cost         = serializedObject.FindProperty("cost");
         SerializedProperty artwork      = serializedObject.FindProperty("artwork");
         SerializedProperty effectType   = serializedObject.FindProperty("effectType");
+        SerializedProperty areaRadius   = serializedObject.FindProperty("areaRadius");
         SerializedProperty targetType   = serializedObject.FindProperty("targetType");
         SerializedProperty effectValue  = serializedObject.FindProperty("effectValue");
         SerializedProperty spawnPrefab  = serializedObject.FindProperty("spawnPrefab");
@@ -26,6 +27,12 @@ public class CardEditor : Editor
         EditorGUILayout.PropertyField(effectType);
 
         CardEffectType selected = (CardEffectType)effectType.enumValueIndex;
+        TargetType targetTypeSelected = (TargetType)targetType.enumValueIndex;
+        if(targetTypeSelected == TargetType.Area)
+        {
+          
+            EditorGUILayout.PropertyField(areaRadius);
+        }
 
         if (selected == CardEffectType.Damage)
         {
@@ -46,6 +53,7 @@ public class CardEditor : Editor
         else if (selected == CardEffectType.Custom)
         {
             EditorGUILayout.PropertyField(customEffect);
+            EditorGUILayout.PropertyField(effectValue);
             EditorGUILayout.PropertyField(targetType);
         }
 
