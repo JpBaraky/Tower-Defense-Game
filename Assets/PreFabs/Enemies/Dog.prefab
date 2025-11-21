@@ -82,7 +82,10 @@ MonoBehaviour:
   moveSpeed: 0.5
   rewardGold: 5
   floatingTextPrefab: {fileID: 2387702292447526891, guid: 3e433432b8fb3534b89eac9a116acdf3, type: 3}
-  pathProgress: 0
+  smokeDelay: 0
+  smokeEffectPrefab: {fileID: 2478918448625118873, guid: c002c487ee2819d4eb7b617ea6976d2b, type: 3}
+  destroyDelay: 0
+  enemyType: {fileID: 11400000, guid: 24349a0ac370dab40b33da1703c1fb88, type: 2}
 --- !u!1 &3177002884117460235
 GameObject:
   m_ObjectHideFlags: 0
@@ -96,7 +99,7 @@ GameObject:
   - component: {fileID: 1114429318127390485}
   - component: {fileID: 7591570822620030997}
   m_Layer: 0
-  m_Name: Wood Monster
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

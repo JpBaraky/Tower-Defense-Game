@@ -20,3 +20,7 @@ MonoBehaviour:
   baseReward: 5
   isFlying: 0
   isBoss: 0
+  spawnsOnDeath:
+  - enemyToSpawn: {fileID: 11400000}
+    count: 2
+    spreadRadius: 0.1

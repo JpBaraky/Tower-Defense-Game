@@ -45,6 +45,8 @@ public class TowerDefenseCamera : MonoBehaviour
 
     void Update()
     {
+      
+   
         HandleKeyboardMovement();
         HandleMouseDrag();
         HandleEdgeScroll();

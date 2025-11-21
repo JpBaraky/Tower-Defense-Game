@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bird
   m_EditorClassIdentifier: Assembly-CSharp::EnemyType
   enemyName: Bird
-  prefab: {fileID: 0}
+  prefab: {fileID: 1955171612413632, guid: c3ad4e1c8663d0e48901d1582868dc1c, type: 3}
   baseHealth: 100
   baseSpeed: 3
   baseDamage: 10

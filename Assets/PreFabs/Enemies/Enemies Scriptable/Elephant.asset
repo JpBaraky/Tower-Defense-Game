@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52a9fbe4602e9504d9cdb055602600e1, type: 3}
+  m_Name: Elephant
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyType
+  enemyName: Elephant
+  prefab: {fileID: 287413184781287655, guid: df35310b5b0ca714e9db62d703c519bd, type: 3}
+  baseHealth: 500
+  baseSpeed: 0.25
+  baseDamage: 5
+  baseReward: 20
+  isFlying: 0
+  isBoss: 0
+  spawnsOnDeath:
+  - enemyToSpawn: {fileID: 11400000, guid: c5b8e90bbdbd4b348834a44c73beaaef, type: 2}
+    count: 5
+    spreadRadius: 0.1

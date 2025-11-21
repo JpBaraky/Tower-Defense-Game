@@ -15,7 +15,7 @@ public class TowerPlacement : MonoBehaviour
     public BillboardSprite billboardManager;
 
     [Header("Economy")]
-    public int startingGold = 100;
+    public int startingGold = 100; 
     public TextMeshProUGUI goldDisplay;
     public int currentGold;
     [Range(0f, 1f)] public float towerSellMultiplier = 0.5f;
@@ -30,6 +30,7 @@ public class TowerPlacement : MonoBehaviour
     private Renderer[] previewRenderers;
     private readonly Dictionary<Vector3Int, bool> occupiedTiles = new();
     private readonly Dictionary<Vector3Int, bool> isGroundTile = new();
+      public static TowerPlacement Instance { get; private set; }
 
     private bool canPlaceTower;
     private bool changedPosition = true;
@@ -37,6 +38,7 @@ public class TowerPlacement : MonoBehaviour
 
     void Start()
     {
+        Instance = this;
         currentGold = startingGold;
         if (mainCamera == null) mainCamera = Camera.main;
 
@@ -54,6 +56,7 @@ public class TowerPlacement : MonoBehaviour
 
     void Update()
     {
+        
         goldDisplay.text = currentGold.ToString();
 
         if (!canPlaceTower)
@@ -150,8 +153,7 @@ public class TowerPlacement : MonoBehaviour
             if (currentGold >= towerPrice)
             {
                 currentGold -= towerPrice;
-                Debug.Log($"Bought tower for {towerPrice} gold. Remaining: {currentGold}");
-
+              
                 Vector3 towerPos = previewTower != null ? previewTower.transform.position : new Vector3(cellCenter.x, GetStableGroundHeight(cellCenter), cellCenter.z);
                 GameObject newTower = Instantiate(towerPrefab, towerPos, Quaternion.identity, transform);
                 occupiedTiles[cell] = true;
@@ -201,6 +203,8 @@ public class TowerPlacement : MonoBehaviour
         previewTower = Instantiate(towerPrefab);
         previewTower.name = "PreviewTower";
         previewTower.tag = "Preview";
+    foreach (Transform t in previewTower.GetComponentsInChildren<Transform>(true))
+    t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 
         Collider col = previewTower.GetComponent<Collider>();
         if (col != null) col.enabled = false;
@@ -286,6 +290,28 @@ public class TowerPlacement : MonoBehaviour
     public void AddGold(int amount)
     {
         currentGold += amount;
-        Debug.Log($"Gained {amount} gold. Current gold: {currentGold}");
     }
+    // Call from other scripts to free the tile a tower was occupying
+public void FreeCellAtPosition(Vector3 worldPosition)
+{
+    // Map world X/Z to the tile cell used by placement
+    Vector3 worldOnPlane = new Vector3(worldPosition.x, 0f, worldPosition.z);
+    Vector3Int cell = tilemap.WorldToCell(worldOnPlane);
+    FreeCell(cell);
+}
+
+public void FreeCell(Vector3Int cell)
+{
+    if (occupiedTiles.ContainsKey(cell))
+    {
+        occupiedTiles[cell] = false;
+        // If you prefer to remove the entry entirely, use:
+        // occupiedTiles.Remove(cell);
+    }
+    else
+    {
+        // Optional: ensure the dict has a clear entry for this cell
+        // occupiedTiles[cell] = false;
+    }
+}
 }

@@ -13,7 +13,18 @@ public class EnemyType : ScriptableObject
     public float baseDamage = 10f;
     public int baseReward = 5;
 
-    [Header("Special")]
+    [Header("Special Flags")]
     public bool isFlying = false;
     public bool isBoss = false;
+
+    [Header("Spawn On Death")]
+    public SpawnEntry[] spawnsOnDeath;
+}
+
+[System.Serializable]
+public struct SpawnEntry
+{
+    public EnemyType enemyToSpawn;   // Which enemy type to spawn
+    public int count;                // How many
+    public float spreadRadius;       // Offset radius around corpse
 }

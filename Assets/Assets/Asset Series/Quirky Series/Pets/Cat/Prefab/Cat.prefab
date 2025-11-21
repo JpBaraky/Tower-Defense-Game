@@ -135,7 +135,7 @@ LODGroup:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1153611095797296}
-  serializedVersion: 2
+  serializedVersion: 3
   m_LocalReferencePoint: {x: 0, y: 0.9132098, z: -0.52816176}
   m_Size: 3.0851932
   m_FadeMode: 0
@@ -155,6 +155,7 @@ LODGroup:
     renderers:
     - renderer: {fileID: 0}
   m_Enabled: 0
+  m_GlobalIlluminationLOD: 0
 --- !u!1 &1227803896749722
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,7 +277,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c4e0241b79a0612478f2b0f292770c5b, type: 2}
+  - {fileID: 2100000, guid: feca6b46b5c033b41a307111e0013f83, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -298,6 +299,7 @@ SkinnedMeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   serializedVersion: 2
   m_Quality: 0
   m_UpdateWhenOffscreen: 0

@@ -48,8 +48,6 @@ MonoBehaviour:
   smallHexRadius: 0.3333
   heightStep: 0.1
   Numbersteps: 4
-  noiseScale: 0.2
-  noiseAmplitude: 0.4
 --- !u!1 &4260103861686090937
 GameObject:
   m_ObjectHideFlags: 0
@@ -62,7 +60,6 @@ GameObject:
   - component: {fileID: 2708417189822886569}
   - component: {fileID: 3431507937234770815}
   - component: {fileID: 3320579679605313521}
-  - component: {fileID: 5574017842628185413}
   m_Layer: 0
   m_Name: HexaGround
   m_TagString: Path
@@ -164,16 +161,3 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4260103861686090937}
   m_Mesh: {fileID: 2534964839176971238, guid: 8c00c7a4162172d4baa378f60ef79c5b, type: 3}
---- !u!114 &5574017842628185413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4260103861686090937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86149b5ddfe79a94dab99e20c950ae01, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlacementSurface
-  allowTowerPlacement: 1
